@@ -1,1 +1,1 @@
-nasm boot_sector.s -f bin -o boot_sector.bin
+nasm bootSector.s -f bin -o bootSector.bin

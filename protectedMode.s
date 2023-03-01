@@ -1,7 +1,7 @@
 BITS 16
-switch_to_pm:
+switchToPm:
     cli ; Disable interrupts.
-    lgdt [gdt_descriptor] ; Set GDT
+    lgdt [gdtDescriptor] ; Set GDT
 
     ; Set the first bit of the cr0 register, enables
     ; protected mode.
@@ -9,13 +9,13 @@ switch_to_pm:
     or eax, 0x1
     mov cr0, eax
 
-    jmp CODE_SEG:initialize_pm ; Far jump to following 
+    jmp codeSeg:initializePm ; Far jump to following 
 
 BITS 32 ; Indicates the following code is 32 bit instructions.
-initialize_pm:
+initializePm:
 
-    ; Initializes the segment registers to the same place.
-    mov ax, DATA_SEG
+    ; Initializes the segment registers to the same place in the data segment.
+    mov ax, dataSeg
     mov ds, ax
     mov ss, ax
     mov es, ax
@@ -25,6 +25,6 @@ initialize_pm:
     ; Initialize the stack pointers to the top of free space
     mov ebp, 0x90000
     mov esp, ebp
-
-
-    jmp pm_exit_point
+    
+    ; Jump out to known exit point due to invalidated registers.
+    jmp pmExitPoint

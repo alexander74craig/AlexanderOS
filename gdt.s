@@ -1,12 +1,12 @@
-gdt_start:
+gdtStart:
 
 ; GDT null segment descriptor.
-gdt_null:
+gdtNull:
 	dd 0x0;
 	dd 0x0;
 
 ; GDT code segment descriptor.
-gdt_code:
+gdtCode:
 	dw 0xffff ; Limit (first 16 bits)
 	dw 0x0 ; Base (bits 0 -15)
 	db 0x0 ; Base (bits 16 -23)
@@ -28,7 +28,7 @@ gdt_code:
 	db 0x0
 
 ; GDT data segment descriptor.
-gdt_data:
+gdtData:
 	dw 0xffff ; Limit (first 16 bits)
 	dw 0x0 ; Base (bits 0 -15)
 	db 0x0 ; Base (bits 16 -23)
@@ -44,14 +44,14 @@ gdt_data:
 	db 0x0
 
 ; Label to mark end of GDT descriptors.
-gdt_end:
+gdtEnd:
 
 ; GDT descriptor.
-gdt_descriptor:
-	dw gdt_end - gdt_start - 1 ; Size of GDT descriptor.
-	dd gdt_start ; Start address of the GDT
+gdtDescriptor:
+	dw gdtEnd - gdtStart - 1 ; Size of GDT descriptor.
+	dd gdtStart ; Start address of the GDT
 
 ; Offset for the code descriptor from the start of the GDT descriptor.
-CODE_SEG equ gdt_code - gdt_start
+codeSeg equ gdtCode - gdtStart
 ; Offset for the data descriptor from the start of the GDT descriptor.
-DATA_SEG equ gdt_data - gdt_start
+dataSeg equ gdtData - gdtStart
