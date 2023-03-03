@@ -6,7 +6,7 @@ extern "C" void main()
     video_memory += 160; 
 
     // Push message into video memory at the current location.
-    char* string{"The kernel is running!                        \0"};
+    char* string{"The kernel is running!\0"};
     for (int charIndex{0}; string[charIndex]; charIndex++)
     {
         *video_memory = string[charIndex];

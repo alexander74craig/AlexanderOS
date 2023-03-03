@@ -11,15 +11,15 @@ AlexanderOS.bin : bootSector.bin kernel.bin
 
 # Kernel binary
 kernel.bin : kernelEntryPoint.o kernel.o
-	~/cross/bin/i686-elf-ld -o $@ -Ttext 0x1000 $^ --oformat binary
+	ld -o kernel.bin -Ttext 0x1000 kernelEntryPoint.o kernel.o --oformat binary
 
 # Kernel object file
 kernel.o : kernel.cpp
-	~/cross/bin/i686-elf-g++ -c $^ -o $@ -ffreestanding
+	g++ -c kernel.cpp -o kernel.o -ffreestanding
 
 # Kernel entry point object file
 kernelEntryPoint.o : kernelEntryPoint.s
-	nasm $^ -f elf -o $@
+	nasm kernelEntryPoint.s -f elf -o kernelEntryPoint.o
 
 # Boot sector
 bootSector.bin : bootSector.s gdt.s loadKernel.s printString.s printStringReal.s protectedMode.s
