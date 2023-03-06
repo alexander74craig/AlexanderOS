@@ -1,3 +1,5 @@
+
+
 # Run
 run : all
 	qemu-system-x86_64 -drive format=raw,file=AlexanderOS.bin,if=floppy
@@ -15,16 +17,20 @@ kernel.bin : kernelEntryPoint.o kernel.o
 
 # Kernel object file
 kernel.o : kernel.cpp
-	g++ -c kernel.cpp -o kernel.o -ffreestanding
+	g++ -c kernel.cpp -o kernel.o -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti
 
 # Kernel entry point object file
 kernelEntryPoint.o : kernelEntryPoint.s
-	nasm kernelEntryPoint.s -f elf -o kernelEntryPoint.o
+	as kernelEntryPoint.s -o kernelEntryPoint.o
 
-# Boot sector
-bootSector.bin : bootSector.s gdt.s loadKernel.s printString.s printStringReal.s protectedMode.s
-	nasm bootSector.s -f bin -o bootSector.bin
+# Boot sector binary.
+bootSector.bin : bootSector.o
+	ld -T bootSector.ld  --oformat binary -o bootSector.bin bootSector.o
+
+# Boot sector object file
+bootSector.o : bootSector.s gdt.s loadKernel.s printString.s printStringReal.s protectedMode.s
+	as bootSector.s -o bootSector.o
 
 # Cleans the directory by removing any build objects
 clean :
-	rm *.bin *.o *.iso *.log *.help
+	rm *.bin *.o *.iso *.log *.help *.dis

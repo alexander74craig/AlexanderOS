@@ -1,16 +1,17 @@
-BITS 16
+.code16
+
 printStringReal:
     pusha
-    mov ah, 0x0e
+    mov $0x0e,  %ah 
 
 printCharacterReal:
-    mov al, [bx] ; Set current character to current position of EBX
+    mov (%bx), %al # Set current character to current position of EBX
 
-    cmp al, 0 ; Checks if at end of string (null character)
-    je exitPrint
+    cmp $0, %al # Checks if at end of string (null character)
+    je exitPrintReal
 
-    int 0x10 ; Prints al
-    add bx, 1 ; Increments one character in message memory
+    int $0x10 # Prints al
+    add $1, %bx # Increments one character in message memory
 
     jmp printCharacterReal
 
@@ -18,11 +19,12 @@ exitPrintReal:
     popa
     ret
 
-; Prints a message to be used for debugging.
+# Prints a message to be used for debugging.
 printDebugReal:
     pusha
-    mov bx, debugHere
+    mov $debugHere, %bx
     call printStringReal
     popa
     ret
-debugHere db "Real mode debug message", 0
+debugHere:
+    .asciz "Real mode debug message"

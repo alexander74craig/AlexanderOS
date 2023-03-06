@@ -1,32 +1,38 @@
-BITS 16
-; Loads the kernel into memory
+
+.code16
+
+# Loads the kernel into memory
 loadKernel:
-    mov ah, 0X2 ; Read Sectors From Drive 
-    mov al, 31 ; read 31 sectors
-    mov ch, 0x0 ; Cylinder 0
-    mov cl, 0x2 ; Sector 2 (2nd sector after boot sector)
-    mov dh, 0x0 ; Head 0
-    mov dl, [bootDrive] ; Read from boot drive
-    mov bx, kernelOffset ; Set the buffer to the kernel memory location
-    int 0x13 ; Interrupt to begin read
-    
-    jc carryError ; Checks carry flag for error
-    mov bl, 31
-    cmp bl, al ; Check if sectors read is 31
-    jne sectorReadError ; display error message
+    mov $0X2, %ah # Read Sectors From Drive 
+    mov $31, %al # read 31 sectors
+    mov $0x0, %ch # Cylinder 0
+    mov $0x2, %cl # Sector 2 (2nd sector after boot sector)
+    mov $0x0, %dh # Head 0
+    mov (bootDrive), %dl # Read from boot drive
+    mov $kernelOffset, %bx # Set the buffer to the kernel memory location
+    int $0x13 # Interrupt to begin read
+
+    jc carryError # Checks carry flag for error
+    mov $31, %bl
+    cmp %bl, %al # Check if sectors read is 31
+    jne sectorReadError # display error message
 
     ret
 
-; Prints a message that the carry flag was set during reading.
+# Prints a message that the carry flag was set during reading.
 carryError:
-    mov bx, carryErrorMessage
+    mov $carryErrorMessage, %bx
     call printStringReal
-    jmp $
-    carryErrorMessage db "Carry flag set when reading from disk.", 0
+    jmp .
 
-; Prints an error message that the program failed to read the expected number of sectors from the disk
+carryErrorMessage:
+    .asciz "Carry flag set when reading from disk. "
+
+# Prints an error message that the program failed to read the expected number of sectors from the disk
 sectorReadError:
-    mov bx, sectorErrorMessage
+    mov $sectorErrorMessage, %bx
     call printStringReal
-    jmp $
-    sectorErrorMessage db "Failed to read the kernel sectors from the disk.", 0
+    jmp .
+
+sectorErrorMessage:
+    .asciz "Failed to read the kernel sectors from the disk. "

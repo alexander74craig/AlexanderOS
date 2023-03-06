@@ -1,5 +1,6 @@
-BITS 32
-extern main ; Tells linker to link to main
+.code32
 
-call main ; Calls main()
-jmp $ ; Hangs
+.extern main
+call main # Calls main()
+
+jmp . # Hangs
