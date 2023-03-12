@@ -23,6 +23,11 @@ stack_top: # Sets a label for the top of the stack
 .global _start
 .type _start, @function
 _start:
+
+# TODO: Set up GDT
+# TODO: Set up IDT
+
+
 	mov $stack_top, %esp # Sets the top of the stack
     call main # Calls kernel main.
     cli # Disable interupts
