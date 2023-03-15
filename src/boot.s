@@ -34,11 +34,12 @@ _start:
     # produce a message stating that an interrupt was thrown.
     call initializeInterruptDescriptorTable
 
-    int $0
+
 
     # TODO: Set up IDT
     .align 16 # Aligns to 16 bytes before call to kernel.
     call main # Calls kernel main.
+    int $0 # Throws an interrupt
     cli # Disable interupts
 # Loop here if returned from kernel
 halt:
