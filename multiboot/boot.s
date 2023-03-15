@@ -23,15 +23,26 @@ stack_top: # Sets a label for the top of the stack
 .global _start
 .type _start, @function
 _start:
-
-# TODO: Set up GDT
-# TODO: Set up IDT
-
-
 	mov $stack_top, %esp # Sets the top of the stack
+
+    # Set GDT.
+    # Describes a flat memory model with 2 segment descriptors, Kernel Code and Kernel Data/
+    # Both segments span from 0 to 4 GiB.
+    lgdt (gdtDescriptor) 
+
+    # Initialize the IDT so that interrupts 
+    # produce a message stating that an interrupt was thrown.
+    call initializeInterruptDescriptorTable
+
+    int $0
+
+    # TODO: Set up IDT
+    .align 16 # Aligns to 16 bytes before call to kernel.
     call main # Calls kernel main.
     cli # Disable interupts
 # Loop here if returned from kernel
 halt:
     hlt
     jmp halt
+
+.include "gdt.s"

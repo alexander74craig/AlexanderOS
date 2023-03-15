@@ -1,18 +1,22 @@
-extern "C" void main() 
+extern "C"
+{
+
+#include <stdint.h>
+
+void main() 
 {
     // Set location of start of the video memory.
-    char* video_memory = (char*)0xb8000;
+    char* videoMemory = (char*)0xb8000;
     // Move down one line in video memory.
-    video_memory += 160; 
+    videoMemory += 160; 
 
     // Push message into video memory at the current location.
     char* string{"The kernel is running!\0"};
-    for (int charIndex{0}; string[charIndex]; charIndex++)
+    for (uint32_t charIndex{0}; string[charIndex]; charIndex++)
     {
-        *video_memory = string[charIndex];
-        video_memory +=2;
+        *videoMemory = string[charIndex];
+        videoMemory +=2;
     }
-
-
     return;
+}
 }

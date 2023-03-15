@@ -55,5 +55,6 @@ gdtDescriptor:
 
 # Offset for the code descriptor from the start of the GDT descriptor
 .set codeSeg,  gdtCode - gdtStart
+.global codeSeg
 # Offset for the data descriptor from the start of the GDT descriptor
 .set dataSeg,  gdtData - gdtStart
