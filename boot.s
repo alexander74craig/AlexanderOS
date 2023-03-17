@@ -1,15 +1,19 @@
-# Multiboot Header
-.set ALIGN, 1<<0 # multiboot flag, align modules on page boundaries
-.set MEMINFO, 1<<1 # multiboot flag, yes memory map
-.set FLAGS, ALIGN | MEMINFO # Flag field
-.set MAGIC, 0x1BADB002 # 'magic number' lets bootloader find the header
-.set CHECKSUM, -(MAGIC + FLAGS) # Checksum for the multiboot information
+# Multiboot2 Header
+.set multibootHeaderSize, multibootHeaderEnd - multibootHeader # Size of the multitboo header
 
 .section .multiboot
-.align 4 # Aligns the multiboot flags on the 32-bit boundary.
-.long MAGIC
-.long FLAGS
-.long CHECKSUM
+.align 8
+multibootHeader:
+    .long 0xE85250D6 # Magic number that specifies multiboot2
+    .long 0x0 # Specifies that the architecture is 32 bit protected mode i386
+    .long multibootHeaderSize # Length of the mutliboot header
+    .long -(0xE85250D6 + 0x0 + multibootHeaderSize) # Checksum
+.align 8
+endTag:
+    .word 0 # Type = End
+    .word 0 # Flags = none
+    .long 8 # Size, 8 according to the specification of the end tag
+multibootHeaderEnd:
 
 
 .section .bss
@@ -33,8 +37,6 @@ _start:
     # Initialize the IDT so that interrupts 
     # produce a message stating that an interrupt was thrown.
     call initializeInterruptDescriptorTable
-
-
 
     # TODO: Set up IDT
     .align 16 # Aligns to 16 bytes before call to kernel.

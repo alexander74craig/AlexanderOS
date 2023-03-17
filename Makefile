@@ -5,17 +5,9 @@ CXX= ~/cross/bin/i686-elf-g++
 CXXFLAGS= -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -nostdlib -lgcc -nodefaultlibs
 ISO_DIR= isodir
 
-# Run
-run : AlexanderOS.bin
-	qemu-system-x86_64 -kernel AlexanderOS.bin
-
 # Run as iso rescue image
-runIso : AlexanderOS.iso
+run: AlexanderOS.iso
 	qemu-system-x86_64 -boot d -cdrom AlexanderOS.iso
-
-# Run iso in bochs
-runBochs : AlexanderOS.iso
-	bochs
 
 # All
 all : AlexanderOS.iso
@@ -28,8 +20,8 @@ AlexanderOS.iso : AlexanderOS.bin
 	grub-mkrescue -o AlexanderOS.iso $(ISO_DIR)
 
 # Links together OS
-AlexanderOS.bin : kernel.o boot.o isr.o idt.o
-	 $(CXX) -T boot.ld -o AlexanderOS.bin  $^ $(CXXFLAGS)
+AlexanderOS.bin : kernel.o boot.o boot.ld idt.o isr.o 
+	 $(CXX)  -T boot.ld -o AlexanderOS.bin kernel.o boot.o idt.o isr.o $(CXXFLAGS)
 
 # Compiles idt
 idt.o : idt.cpp
@@ -51,6 +43,3 @@ isr.o : isr.s
 clean :
 	rm *.bin *.o *.iso *.log *.help *.dis *.dism; \
 	rm -r $(ISO_DIR)
-
-isr.o : isr.s
-	$(AS) isr.s -o isr.o
