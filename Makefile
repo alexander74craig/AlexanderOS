@@ -2,7 +2,7 @@
 AS= ~/cross/bin/i686-elf-as 
 CC= ~/cross/bin/i686-elf-gcc
 CXX= ~/cross/bin/i686-elf-g++ 
-CXXFLAGS= -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -nostdlib -lgcc -nodefaultlibs
+CXXFLAGS= -ffreestanding -Wall -Wextra  -fno-rtti -nostdlib -lgcc -nodefaultlibs -fno-exceptions
 ISO_DIR= isodir
 
 # Run as iso rescue image
@@ -20,7 +20,7 @@ AlexanderOS.iso : AlexanderOS.bin
 	grub-mkrescue -o AlexanderOS.iso $(ISO_DIR)
 
 # Links together OS
-AlexanderOS.bin : kernel.o boot.o boot.ld idt.o isr.o 
+AlexanderOS.bin : kernel.o boot.o boot.ld idt.o isr.o printing.o
 	 $(CXX)  -T boot.ld -o AlexanderOS.bin kernel.o boot.o idt.o isr.o $(CXXFLAGS)
 
 # Compiles idt
@@ -38,6 +38,10 @@ boot.o : boot.s
 # Assembles isr 
 isr.o : isr.s
 	$(AS) isr.s -o isr.o
+
+# Compiles printing utility
+printing.o : printing.cpp
+	$(CXX) -c printing.cpp -o printing.o $(CXXFLAGS)
 
 # Cleans the directory by removing any build objects
 clean :

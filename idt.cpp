@@ -1,6 +1,7 @@
 extern "C"
 {
 #include <stdint.h>
+#include "printing.cpp"
 
 #pragma pack(push, 1)
 // IDT entry
@@ -26,18 +27,10 @@ struct IDTR
 // Function called when interrupts occur
 void handleInterrupt()
 {
-    // Set location of start of the video memory.
-    char* videoMemory = (char*)0xb8000;
-    // Move down two lines in video memory.
-    videoMemory += 320; 
-
-    // Push message into video memory at the current location.
     char* string{"An interupt was thrown!\0"};
-    for (uint32_t charIndex{0}; string[charIndex]; charIndex++)
-    {
-        *videoMemory = string[charIndex];
-        videoMemory +=2;
-    }
+    static VGATextModeBuffer vgaBuffer;
+    vgaBuffer.clearScreen();
+    vgaBuffer.writeString(string);
     asm("cli; hlt");
 }
 
