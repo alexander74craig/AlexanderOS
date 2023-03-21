@@ -20,28 +20,28 @@ AlexanderOS.iso : AlexanderOS.bin
 	grub-mkrescue -o AlexanderOS.iso $(ISO_DIR)
 
 # Links together OS
-AlexanderOS.bin : kernel.o boot.o boot.ld idt.o isr.o printing.o
-	 $(CXX)  -T boot.ld -o AlexanderOS.bin kernel.o boot.o idt.o isr.o $(CXXFLAGS)
+AlexanderOS.bin : kernel.o Boot.o Boot.ld IDT.o ISR.o VGATextModeBuffer.o
+	 $(CXX)  -T Boot.ld -o AlexanderOS.bin kernel.o Boot.o IDT.o ISR.o $(CXXFLAGS)
 
 # Compiles idt
-idt.o : idt.cpp
-	$(CXX) -c idt.cpp -o idt.o $(CXXFLAGS)
+IDT.o : IDT.cpp
+	$(CXX) -c IDT.cpp -o IDT.o $(CXXFLAGS)
 
 # Compiles kernel
 kernel.o : kernel.cpp
 	$(CXX) -c kernel.cpp -o kernel.o $(CXXFLAGS)
 
 # Assembles boot 
-boot.o : boot.s
-	$(AS) boot.s -o boot.o
+Boot.o : Boot.s
+	$(AS) Boot.s -o Boot.o
 
 # Assembles isr 
-isr.o : isr.s
-	$(AS) isr.s -o isr.o
+ISR.o : ISR.s
+	$(AS) ISR.s -o ISR.o
 
 # Compiles printing utility
-printing.o : printing.cpp
-	$(CXX) -c printing.cpp -o printing.o $(CXXFLAGS)
+VGATextModeBuffer.o : VGATextModeBuffer.cpp
+	$(CXX) -c VGATextModeBuffer.cpp -o VGATextModeBuffer.o $(CXXFLAGS)
 
 # Cleans the directory by removing any build objects
 clean :

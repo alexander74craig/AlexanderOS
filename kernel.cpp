@@ -1,7 +1,7 @@
 extern "C"
 {
 #include <stdint.h>
-#include "printing.cpp"
+#include "VGATextModeBuffer.cpp"
 
 uint32_t readBootTag(uint32_t*& address, VGATextModeBuffer& vgaBuffer)
 {

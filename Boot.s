@@ -49,4 +49,4 @@ halt:
     hlt
     jmp halt
 
-.include "gdt.s"
+.include "GDT.s"

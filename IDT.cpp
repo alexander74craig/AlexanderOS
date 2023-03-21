@@ -1,7 +1,7 @@
 extern "C"
 {
 #include <stdint.h>
-#include "printing.cpp"
+#include "VGATextModeBuffer.cpp"
 
 #pragma pack(push, 1)
 // IDT entry
