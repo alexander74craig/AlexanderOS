@@ -28,19 +28,18 @@ stack_top: # Sets a label for the top of the stack
 .type _start, @function
 _start:
 	mov $stack_top, %esp # Sets the top of the stack
+    push %ebx # Pushes EBX as an argument to main
+    push %eax # Pusehs EAX as an argument to main
 
     # Set GDT.
     # Describes a flat memory model with 2 segment descriptors, Kernel Code and Kernel Data/
     # Both segments span from 0 to 4 GiB.
-    # lgdt (gdtDescriptor) 
-
+    lgdt (gdtDescriptor) 
 
     # Initialize the IDT so that interrupts 
-    # call initializeInterruptDescriptorTable
+    call initializeInterruptDescriptorTable
 
     .align 16 # Aligns to 16 bytes before call to kernel.
-    push %ebx # Pushes EBX as an argument to main
-    push %eax # Pusehs EAX as an argument to main
     call main # Calls kernel main.
 
 # Loop here if returned from kernel

@@ -2,53 +2,9 @@ extern "C"
 {
 #include <stdint.h>
 #include "VGATextModeBuffer.cpp"
+#include "BootInformation.hpp"
 
-uint32_t readBootTag(uint32_t*& address, VGATextModeBuffer& vgaBuffer)
-{
-    vgaBuffer.writeString("type = ");
-    vgaBuffer.writeHexLong(*address);
-    uint32_t type{*address};
-    address++;
-
-    vgaBuffer.writeString("| size = ");
-    vgaBuffer.writeHexLong(*address);
-    uint32_t size = *address;
-    address++;
-
-    vgaBuffer.writeString("| data: ");
-    uint32_t currentSize{8};
-
-    if (type != 9)
-    {
-        while (currentSize < size)
-        {
-            vgaBuffer.writeHexLong(*address);
-            address++;
-            vgaBuffer.writeChar(' ');
-
-            vgaBuffer.writeHexLong(*address);
-            address++;
-            vgaBuffer.writeChar(' ');
-            currentSize += 8;
-        } 
-    }
-    else 
-    {
-        vgaBuffer.writeString("Skipped.");
-        while (currentSize < size)
-        {
-            address++;
-            address++;
-            currentSize += 8;
-        } 
-    }
-    
-    vgaBuffer.writeChar('\n');
-    return currentSize;
-}
-
-
-void main(uint32_t eax, uint32_t* ebx) 
+void main(uint32_t eax, void* ebx) 
 {
     VGATextModeBuffer vgaBuffer;
 
@@ -58,21 +14,38 @@ void main(uint32_t eax, uint32_t* ebx)
         return;
     }
 
-    vgaBuffer.writeString("total_size = ");
-    vgaBuffer.writeHexLong(*ebx);
-    vgaBuffer.writeChar('\n');
-    uint32_t total_size{*ebx};
-    ebx++;
-
-    //Reserved 0s
-    ebx++;
-
-    uint32_t currentSize{8};
-    while(currentSize < total_size)
+    BootInformation bootInformation(ebx);
+    if (bootInformation.valid ==  false)
     {
-        currentSize += readBootTag(ebx, vgaBuffer);
+        vgaBuffer.writeString("Invalid boot information.\n");
     }
 
+    vgaBuffer.writeString("frameBufferAddress: ");
+    vgaBuffer.writeHexLong(bootInformation.framebufferAddress);
+    vgaBuffer.writeString("\nframeBufferPitch ");
+    vgaBuffer.writeHexWord(bootInformation.framebufferPitch);
+    vgaBuffer.writeString("\nframeBufferWidth ");
+    vgaBuffer.writeHexWord(bootInformation.framebufferWidth);
+    vgaBuffer.writeString("\nframeBufferHeight ");
+    vgaBuffer.writeHexWord(bootInformation.framebufferHeight);
+
+    vgaBuffer.writeString("\nframeBufferBitsPerPixel ");
+    vgaBuffer.writeHexByte(bootInformation.framebufferBitsPerPixel);
+    vgaBuffer.writeString("\nframeBufferType ");
+    vgaBuffer.writeHexByte(bootInformation.framebufferType);
+    vgaBuffer.writeString("\nframeBufferRedFieldPosition ");
+    vgaBuffer.writeHexByte(bootInformation.framebufferRedFieldPosition);
+    vgaBuffer.writeString("\nframeBufferRedMaskSize ");
+    vgaBuffer.writeHexByte(bootInformation.framebufferRedMaskSize);
+    vgaBuffer.writeString("\nframeBufferGreenFieldPosition ");
+    vgaBuffer.writeHexByte(bootInformation.framebufferGreenFieldPosition);
+    vgaBuffer.writeString("\nframeBufferGreenMaskSize ");
+    vgaBuffer.writeHexByte(bootInformation.framebufferGreenMaskSize);
+    vgaBuffer.writeString("\nframeBufferBlueFieldPosition ");
+    vgaBuffer.writeHexByte(bootInformation.framebufferBlueFieldPosition);
+    vgaBuffer.writeString("\nframeBufferBlueMaskSize ");
+    vgaBuffer.writeHexByte(bootInformation.framebufferBlueMaskSize);
+    
     return;
 }
 }
