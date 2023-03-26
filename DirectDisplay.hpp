@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-// 8 bit color depth display
+// 16 bit color depth display
 class DirectDisplay
 {
 private:
