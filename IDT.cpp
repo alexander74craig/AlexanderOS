@@ -1,7 +1,6 @@
 extern "C"
 {
 #include <stdint.h>
-#include "VGATextModeBuffer.hpp"
 
 #pragma pack(push, 1)
 // IDT entry
@@ -27,10 +26,7 @@ struct IDTR
 // Function called when interrupts occur
 void handleInterrupt()
 {
-    char* string{"An interupt was thrown!\0"};
-    VGATextModeBuffer vgaBuffer;
-    vgaBuffer.clearScreen();
-    vgaBuffer.writeString(string);
+    //TODO: print "An interupt was thrown!"
     asm("cli; hlt");
 }
 

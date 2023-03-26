@@ -7,7 +7,6 @@ class BootInformation
 public:
     BootInformation(void* ebx);
 
-    bool valid;
     // Framebuffer type = 8
     // Address of frame buffer.
     uint64_t framebufferAddress;
