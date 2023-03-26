@@ -9,6 +9,14 @@ multibootHeader:
     .long multibootHeaderSize # Length of the mutliboot header
     .long -(0xE85250D6 + 0x0 + multibootHeaderSize) # Checksum
 .align 8
+framebufferTag:
+    .word 5 # Type = 5 i.e. framebuffer tag
+    .word 0x0 # Flags
+    .long 20 # size of tag
+    .long 640 # Width = 640 pixels
+    .long 480 # Height = 480 pixels
+    .long 16 # 16 bits per pixel
+.align 8
 endTag:
     .word 0 # Type = End
     .word 0 # Flags = none

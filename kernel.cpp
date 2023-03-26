@@ -3,18 +3,21 @@ extern "C"
 #include <stdint.h>
 #include "VGATextModeBuffer.hpp"
 #include "BootInformation.hpp"
+#include "DirectDisplay.hpp"
 
 void main(uint32_t eax, void* ebx) 
 {
-    VGATextModeBuffer vgaBuffer;
+
+    //VGATextModeBuffer vgaBuffer;
 
     if (eax != 0x36d76289)
     {
-        vgaBuffer.writeString("Invalid bootloader magic number.");
+        //vgaBuffer.writeString("Invalid bootloader magic number.");
         return;
     }
 
     BootInformation bootInformation(ebx);
+/*
     if (bootInformation.valid ==  false)
     {
         vgaBuffer.writeString("Invalid boot information.\n");
@@ -46,6 +49,10 @@ void main(uint32_t eax, void* ebx)
     vgaBuffer.writeHexByte(bootInformation.framebufferBlueFieldPosition);
     vgaBuffer.writeString("\nframeBufferBlueMaskSize ");
     vgaBuffer.writeHexByte(bootInformation.framebufferBlueMaskSize);
+    */
+
+    DirectDisplay display(bootInformation.framebufferAddress, bootInformation.framebufferHeight, bootInformation.framebufferWidth);
+    display.testDisplay();
     
     return;
 }
