@@ -21,7 +21,7 @@ AlexanderOS.iso : AlexanderOS.bin
 
 # Links together OS
 AlexanderOS.bin : kernel.o Boot.o Boot.ld IDT.o ISR.o VGATextModeBuffer.o BootInformation.o
-	 $(CXX)  -T Boot.ld -o AlexanderOS.bin kernel.o Boot.o IDT.o ISR.o BootInformation.o $(CXXFLAGS)
+	 $(CXX)  -T Boot.ld -o AlexanderOS.bin kernel.o Boot.o IDT.o ISR.o BootInformation.o VGATextModeBuffer.o $(CXXFLAGS)
 
 # Compiles idt
 IDT.o : IDT.cpp

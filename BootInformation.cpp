@@ -1,16 +1,9 @@
 #include "BootInformation.hpp"
-#include "VGATextModeBuffer.cpp"
 
-
-BootInformation::BootInformation(void* ebx) : 
-    valid{true}
+BootInformation::BootInformation(void* ebx)
 {
-    VGATextModeBuffer vgaBuffer;
-
     // Total size of boot information
     uint32_t total_size(readUint32(ebx));
-    vgaBuffer.writeString("total Size ");
-    vgaBuffer.writeHexWord(total_size);
     //Reserved 0s
     readUint32(ebx);
 
@@ -22,6 +15,13 @@ BootInformation::BootInformation(void* ebx) :
 
         // Size in bytes.
         uint32_t size{readUint32(ebx)};
+
+        uint32_t dataSize = size - 8;
+        // Checks for padding to maintain tag alignment
+        if (dataSize % 8 != 0)
+        {
+            dataSize = dataSize + (8 - (dataSize % 8));
+        }
 
         // Framebuffer Tag
         if (type == 8)
@@ -43,57 +43,29 @@ BootInformation::BootInformation(void* ebx) :
                 framebufferGreenMaskSize = readUint8(ebx);
                 framebufferBlueFieldPosition = readUint8(ebx);
                 framebufferBlueMaskSize = readUint8(ebx);
-                //Alignment padding
-                readUint32(ebx);
-            }
-            else if (framebufferType == 0)
-            {
                 // Alignment padding
-                uint32_t dataBytes = size - 22;
-                if (dataBytes % 8 != 0)
-                {
-                    ebx = (uint8_t*)ebx + dataBytes + (8 - (dataBytes % 8));
-                }
-                else 
-                {
-                    ebx = (uint8_t*)ebx + dataBytes;
-                }        
+                readUint32(ebx);
             }
             else
             {
-                //Alignment padding
                 framebufferRedFieldPosition = 0;
                 framebufferRedMaskSize = 0;
                 framebufferGreenFieldPosition = 0;
                 framebufferGreenMaskSize = 0;
                 framebufferBlueFieldPosition = 0;
                 framebufferBlueMaskSize = 0;
-                readUint16(ebx);
+                // Alignment padding
+                dataSize -= 22;
+                ebx = (uint8_t*)ebx + dataSize;      
             }
         }
         else 
         {
             // Skips over the current data section
-            // Increments of 8 bytes to account for padding.
-            uint32_t dataBytes = size - 8;
-            if (dataBytes % 8 != 0)
-            {
-               ebx = (uint8_t*)ebx + dataBytes + (8 - (dataBytes % 8));
-            }
-            else 
-            {
-                ebx = (uint8_t*)ebx + dataBytes;
-            }
+            ebx = (uint8_t*)ebx + dataSize;
         }
         // Adds size plus padding to current size of data read.
-        if (size % 8 != 0)
-        {
-            currentSize += size + (8 - (size % 8));
-        }
-        else 
-        {
-            currentSize += size;
-        }
+        currentSize += dataSize + 8;
     }
 }
 

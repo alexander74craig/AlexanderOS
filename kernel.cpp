@@ -1,7 +1,7 @@
 extern "C"
 {
 #include <stdint.h>
-#include "VGATextModeBuffer.cpp"
+#include "VGATextModeBuffer.hpp"
 #include "BootInformation.hpp"
 
 void main(uint32_t eax, void* ebx) 
@@ -18,6 +18,7 @@ void main(uint32_t eax, void* ebx)
     if (bootInformation.valid ==  false)
     {
         vgaBuffer.writeString("Invalid boot information.\n");
+        return;
     }
 
     vgaBuffer.writeString("frameBufferAddress: ");

@@ -32,7 +32,10 @@ public:
 
 private:
     uint64_t readUint64(void*& ebx);
+
     uint32_t readUint32(void*& ebx);
+
     uint16_t readUint16(void*& ebx);
+    
     uint8_t readUint8(void*& ebx);
 };

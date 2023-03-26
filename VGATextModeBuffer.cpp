@@ -1,128 +1,118 @@
-#include <stdint.h>
+#include "VGATextModeBuffer.hpp"
 
-class VGATextModeBuffer
+VGATextModeBuffer::VGATextModeBuffer() :
+        myColumn{0},
+        myRow{0}
 {
-private:
-    // Current position on screen.
-    uint32_t column = 0; // Max 80 characters per line
-    uint32_t row = 0; // Max 25 characters lines per screen
+}
 
-    // Scrolls the screen one line, sets position to the first character of the last line.
-    void scroll()
+void VGATextModeBuffer::scroll()
+{
+    char* position = (char*) 0xB8000;
+    char* nextLinePos = position + 160;
+    for (uint32_t myRow{0}; myRow < 24; myRow++)
+    {
+        for (uint32_t myColumn{0}; myColumn < 80; myColumn++)
+        {
+            *position =*nextLinePos;
+            position +=2;
+            nextLinePos +=2;
+        }
+    }
+    for (uint32_t myColumn{0}; myColumn < 80; myColumn++)
+    {
+        *position = ' ';
+        position +=2;
+    }
+}
+
+void VGATextModeBuffer::writeHexNibble(uint8_t nibble)
+{
+    if (nibble < 10)   
+    {
+        writeChar(nibble + 48);
+    }
+    else if (nibble < 16)
+    {
+        writeChar(nibble + 55);
+    }
+    else 
+    {
+        writeChar('?');
+    }
+}
+
+void VGATextModeBuffer::writeHexByte(uint8_t byte)
+{
+    uint8_t lower = 0xF & byte;
+    uint8_t upper = byte >> 4;
+    writeHexNibble(upper);
+    writeHexNibble(lower);
+}
+
+void VGATextModeBuffer::writeHexWord(uint16_t word)
+{
+    uint8_t lower = 0xFF & word;
+    uint8_t upper = word >> 8;
+    writeHexByte(upper);
+    writeHexByte(lower);
+}
+
+void VGATextModeBuffer::writeHexLong(uint32_t longInt)
+{
+    uint16_t lower = 0xFFFF & longInt;
+    uint16_t upper = longInt >> 16;
+    writeHexWord(upper);
+    writeHexWord(lower);
+}
+
+void VGATextModeBuffer::writeChar(char character)
+{
+    if (character == '\n')
+    {            
+        myRow +=1;
+        myColumn = 0;
+    }
+    else 
     {
         char* position = (char*) 0xB8000;
-        char* nextLinePos = position + 160;
-        for (uint32_t row{0}; row < 24; row++)
-        {
-            for (uint32_t column{0}; column < 80; column++)
-            {
-                *position =*nextLinePos;
-                position +=2;
-                nextLinePos +=2;
-            }
-        }
-        for (uint32_t column{0}; column < 80; column++)
+        position += (myColumn * 2) + (myRow * 160);
+        *position = character;
+        myColumn++;
+    }
+
+    if (myColumn > 79)
+    {
+        myRow +=1;
+        myColumn = 0;
+    }
+    if (myRow > 24)
+    {
+        scroll();
+        myColumn = 0;
+        myRow = 24;
+    }
+}
+
+void VGATextModeBuffer:: writeString(char* string)
+{
+    for (uint32_t charIndex{0}; string[charIndex]; charIndex++)
+    {
+        writeChar(string[charIndex]);
+    }
+}
+
+void VGATextModeBuffer::clearScreen()
+{
+    char* position = (char*) 0xB8000;
+    for (uint32_t myRow{0}; myRow < 25; myRow++)
+    {
+        for (uint32_t myColumn{0}; myColumn < 80; myColumn++)
         {
             *position = ' ';
             position +=2;
         }
     }
-
-    void writeHexNibble(uint8_t nibble)
-    {
-        if (nibble < 10)   
-        {
-            writeChar(nibble + 48);
-        }
-        else if (nibble < 16)
-        {
-            writeChar(nibble + 55);
-        }
-        else 
-        {
-            writeChar('?');
-        }
-    }
-
-public:
-    // Default constructor, clears the screen.
-    VGATextModeBuffer() = default;
-
-    void writeHexByte(uint8_t byte)
-    {
-        uint8_t lower = 0xF & byte;
-        uint8_t upper = byte >> 4;
-        writeHexNibble(upper);
-        writeHexNibble(lower);
-    }
-
-    void writeHexWord(uint16_t word)
-    {
-        uint8_t lower = 0xFF & word;
-        uint8_t upper = word >> 8;
-        writeHexByte(upper);
-        writeHexByte(lower);
-    }
-
-    void writeHexLong(uint32_t longInt)
-    {
-        uint16_t lower = 0xFFFF & longInt;
-        uint16_t upper = longInt >> 16;
-        writeHexWord(upper);
-        writeHexWord(lower);
-    }
-
-    // Writes a character at the current position and handles scrolling.
-    void writeChar(char character)
-    {
-        if (character == '\n')
-        {            
-            row +=1;
-            column = 0;
-        }
-        else 
-        {
-            char* position = (char*) 0xB8000;
-            position += (column * 2) + (row * 160);
-            *position = character;
-            column++;
-        }
-
-        if (column > 79)
-        {
-            row +=1;
-            column = 0;
-        }
-        if (row > 24)
-        {
-            scroll();
-            column = 0;
-            row = 24;
-        }
-    }
-
-    // Writes a string at the current position and handles scrolling.
-    void writeString(char* string)
-    {
-        for (uint32_t charIndex{0}; string[charIndex]; charIndex++)
-        {
-            writeChar(string[charIndex]);
-        }
-    }
-
-    // Clears the screen and sets current position to 0,0.
-    void clearScreen()
-    {
-        char* position = (char*) 0xB8000;
-        for (uint32_t row{0}; row < 25; row++)
-        {
-            for (uint32_t column{0}; column < 80; column++)
-            {
-                *position = ' ';
-                position +=2;
-            }
-        }
-        column = 0;
-        row = 0;
-    }
-};
+    myColumn = 0;
+    myRow = 0;
+}

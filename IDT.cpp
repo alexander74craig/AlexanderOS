@@ -1,7 +1,7 @@
 extern "C"
 {
 #include <stdint.h>
-#include "VGATextModeBuffer.cpp"
+#include "VGATextModeBuffer.hpp"
 
 #pragma pack(push, 1)
 // IDT entry
@@ -28,7 +28,7 @@ struct IDTR
 void handleInterrupt()
 {
     char* string{"An interupt was thrown!\0"};
-    static VGATextModeBuffer vgaBuffer;
+    VGATextModeBuffer vgaBuffer;
     vgaBuffer.clearScreen();
     vgaBuffer.writeString(string);
     asm("cli; hlt");
