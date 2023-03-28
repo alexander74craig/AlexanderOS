@@ -12,7 +12,7 @@ struct GateDescriptor
     uint8_t     flags; // Flags used to specify type of gate of the interrupt entry
 	uint16_t    ISR_AddressHigh; // The higher 16 bits of the ISR's address
 };
-#pragma pop()
+#pragma pack(pop)
 
 #pragma pack(push, 1)
 // Struct representing the value of the interrupt descriptor table register.

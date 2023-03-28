@@ -19,7 +19,20 @@ void main(uint32_t eax, void* ebx)
             bootInformation.framebufferHeight, 
             bootInformation.framebufferWidth);
 
-    display.testDisplay();
+    
+
+
+    //display.testDisplay();
+    
+    char character = 0x0;
+    for (uint32_t iHeight{0}; iHeight < 30; iHeight++)
+    {
+        for (uint32_t iWidth{0}; iWidth < 80; iWidth++)
+        {
+            display.printChar(iWidth, iHeight, character);
+            character++;
+        }
+    }
     
     return;
 }

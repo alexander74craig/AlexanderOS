@@ -27,7 +27,7 @@ multibootHeaderEnd:
 .section .bss
 .align 16 # Aligns the block on 16 byte memory boundary
 stack_bottom: # Sets label for the bottom of the stack
-.skip 16384 # Writes 16kb of 0s
+.skip 65536 # Writes 64 kib of 0s
 stack_top: # Sets a label for the top of the stack
 
 

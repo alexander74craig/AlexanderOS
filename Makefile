@@ -2,7 +2,7 @@
 AS= ~/cross/bin/i686-elf-as 
 CC= ~/cross/bin/i686-elf-gcc
 CXX= ~/cross/bin/i686-elf-g++ 
-CXXFLAGS= -ffreestanding -Wall -Wextra  -fno-rtti -nostdlib -lgcc -nodefaultlibs -fno-exceptions
+CXXFLAGS= -ffreestanding -Wall -Wextra -fno-rtti -nostdlib -nodefaultlibs -lgcc -fno-exceptions
 ISO_DIR= isodir
 
 # Run as iso rescue image
@@ -20,8 +20,8 @@ AlexanderOS.iso : AlexanderOS.bin
 	grub-mkrescue -o AlexanderOS.iso $(ISO_DIR)
 
 # Links together OS
-AlexanderOS.bin : kernel.o Boot.o Boot.ld IDT.o ISR.o VGATextModeBuffer.o BootInformation.o DirectDisplay.o 
-	 $(CXX)  -T Boot.ld -o AlexanderOS.bin kernel.o Boot.o IDT.o ISR.o BootInformation.o VGATextModeBuffer.o DirectDisplay.o $(CXXFLAGS)
+AlexanderOS.bin : kernel.o Boot.o Boot.ld IDT.o ISR.o VGATextModeBuffer.o BootInformation.o DirectDisplay.o Font.o 
+	 $(CXX) -T Boot.ld -o AlexanderOS.bin kernel.o Boot.o IDT.o ISR.o BootInformation.o VGATextModeBuffer.o DirectDisplay.o Font.o $(CXXFLAGS) 
 
 # Compiles idt
 IDT.o : IDT.cpp
@@ -49,6 +49,10 @@ BootInformation.o : BootInformation.cpp
 # Direct display utility
 DirectDisplay.o : DirectDisplay.cpp
 	$(CXX) -c DirectDisplay.cpp -o DirectDisplay.o $(CXXFLAGS)
+
+#Font 
+Font.o : Font.cpp
+	$(CXX) -c Font.cpp -o Font.o $(CXXFLAGS)
 
 # Cleans the directory by removing any build objects
 clean :
