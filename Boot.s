@@ -44,6 +44,7 @@ _start:
 
     # Long jump to set cs register
     jmp $codeSeg, $postGDTLongJump
+
     postGDTLongJump:
 
     # Set Segment registers.
@@ -59,8 +60,12 @@ _start:
     push %eax # Pushes EAX as an argument to main
 
     # Initialize the IDT so that interrupts can be handled
-    # TODO: FIX
-    #call initializeInterruptDescriptorTable
+    call initializeInterruptDescriptorTable
+
+    # Disable the IRQ
+    mov $0xff, %al
+    out %al, $0x21
+    out %al, $0xa1
 
     .align 16 # Aligns to 16 bytes before call to kernel.
     call main # Calls kernel main.

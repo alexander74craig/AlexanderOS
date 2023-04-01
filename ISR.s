@@ -2,161 +2,193 @@ interruptServiceRoutine0:
     mov $0, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine1:
     mov $1, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine2:
     mov $2, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine3:
     mov $3, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine4:
     mov $4, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine5:
     mov $5, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine6:
     mov $6, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine7:
     mov $7, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine8:
     mov $8, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine9:
     mov $9, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine10:
     mov $10, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine11:
     mov $11, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine12:
     mov $12, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine13:
     mov $13, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine14:
     mov $14, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine15:
     mov $15, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine16:
     mov $16, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine17:
     mov $17, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine18:
     mov $18, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine19:
     mov $19, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine20:
     mov $20, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine21:
     mov $21, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine22:
     mov $22, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine23:
     mov $23, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine24:
     mov $24, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine25:
     mov $25, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine26:
     mov $26, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine27:
     mov $27, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine28:
     mov $28, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine29:    
     mov $29, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine30:
     mov $30, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 interruptServiceRoutine31:
     mov $31, %eax
     push %eax
     call handleInterrupt
+    pop %eax
     iret
 .global interruptServiceRoutineTable
 interruptServiceRoutineTable:
