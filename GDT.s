@@ -20,7 +20,7 @@ gdtCode:
 	# [readable:1] Can be read
 	# [accessed:0] Has not been accessed, this bit is set by a debugger
 	.byte 0b10011010
-	# [granularity:1] Multiplies the limits by 4k allowing this segments to span 4Gb
+	# [granularity:1] Multiplies the limits by 4k allowing this segment to span 4Gb
 	# [32 bit:1] Is 32 bit
 	# [64 bit:0] Is not 64 bit code
 	# [AVL:0] Unused bit that can be used by our OS, unset

@@ -13,9 +13,9 @@ framebufferTag:
     .word 5 # Type = 5 i.e. framebuffer tag
     .word 0x0 # Flags
     .long 20 # size of tag
-    .long 640 # Width = 640 pixels
-    .long 480 # Height = 480 pixels
-    .long 16 # 16 bits per pixel
+    .long 0 # Width agnostic
+    .long 0 # Height agnostic
+    .long 24 # 24 bits per pixel
 .align 8
 endTag:
     .word 0 # Type = End
@@ -27,7 +27,7 @@ multibootHeaderEnd:
 .section .bss
 .align 16 # Aligns the block on 16 byte memory boundary
 stack_bottom: # Sets label for the bottom of the stack
-.skip 65536 # Writes 64 kib of 0s
+.skip 32768 # Writes 32 kib of 0s
 stack_top: # Sets a label for the top of the stack
 
 
@@ -35,17 +35,32 @@ stack_top: # Sets a label for the top of the stack
 .global _start
 .type _start, @function
 _start:
-	mov $stack_top, %esp # Sets the top of the stack
-    push %ebx # Pushes EBX as an argument to main
-    push %eax # Pusehs EAX as an argument to main
+
 
     # Set GDT.
     # Describes a flat memory model with 2 segment descriptors, Kernel Code and Kernel Data/
     # Both segments span from 0 to 4 GiB.
     lgdt (gdtDescriptor) 
 
-    # Initialize the IDT so that interrupts 
-    call initializeInterruptDescriptorTable
+    # Long jump to set cs register
+    jmp $codeSeg, $postGDTLongJump
+    postGDTLongJump:
+
+    # Set Segment registers.
+    mov $dataSeg, %dx
+    mov %dx, %ds
+    mov %dx, %ss
+    mov %dx, %es
+    mov %dx, %gs
+    mov %dx, %fs
+    mov $stack_top, %esp # Sets the top of the stack
+
+    push %ebx # Pushes EBX as an argument to main
+    push %eax # Pushes EAX as an argument to main
+
+    # Initialize the IDT so that interrupts can be handled
+    # TODO: FIX
+    #call initializeInterruptDescriptorTable
 
     .align 16 # Aligns to 16 bytes before call to kernel.
     call main # Calls kernel main.

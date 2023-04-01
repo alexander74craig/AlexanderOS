@@ -2,6 +2,8 @@ extern "C"
 {
 #include <stdint.h>
 
+#include "DirectDisplay.hpp"
+
 #pragma pack(push, 1)
 // IDT entry
 struct GateDescriptor
@@ -24,10 +26,12 @@ struct IDTR
 #pragma pack(pop)
 
 // Function called when interrupts occur
-void handleInterrupt()
+void handleInterrupt(uint16_t interruptIndex)
 {
-    //TODO: print "An interupt was thrown!"
-    asm("cli; hlt");
+    //DirectDisplay display{0xFD000000, 0x400, 0x300};
+    //display.writeString("An interrupt was thrown! Interrupt vector 0x");
+    //display.writeHexWord(interruptIndex);
+    return;
 }
 
 #pragma pack(push, 16)

@@ -14,26 +14,15 @@ void main(uint32_t eax, void* ebx)
     }
 
     BootInformation bootInformation(ebx);
-
-    DirectDisplay display(bootInformation.framebufferAddress, 
-            bootInformation.framebufferHeight, 
-            bootInformation.framebufferWidth);
-
     
-
-
-    //display.testDisplay();
+    DirectDisplay display(bootInformation.framebufferAddress, bootInformation.framebufferWidth, bootInformation.framebufferHeight);
     
-    char character = 0x0;
-    for (uint32_t iHeight{0}; iHeight < 30; iHeight++)
-    {
-        for (uint32_t iWidth{0}; iWidth < 80; iWidth++)
-        {
-            display.printChar(iWidth, iHeight, character);
-            character++;
-        }
-    }
-    
+    display.writeString("Alexander OS!\n");
+    display.writeString("1234567890-=\n");
+    display.writeString("!@#$%^&*()_+\n");
+    display.writeString("[]\\;',./{}|:\">?~`\n");
+    display.writeString("the quick brown fox jumps over the lazy dog.\n");
+    display.writeString("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG!\n");
     return;
 }
 }
