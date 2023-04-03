@@ -1,5 +1,5 @@
 # Multiboot2 Header
-.set multibootHeaderSize, multibootHeaderEnd - multibootHeader # Size of the multitboo header
+.set multibootHeaderSize, multibootHeaderEnd - multibootHeader # Size of the multitboot header
 
 .section .multiboot
 .align 8
@@ -13,9 +13,9 @@ framebufferTag:
     .word 5 # Type = 5 i.e. framebuffer tag
     .word 0x0 # Flags
     .long 20 # size of tag
-    .long 0 # Width agnostic
-    .long 0 # Height agnostic
-    .long 24 # 24 bits per pixel
+    .long 640 # 640 px width 
+    .long 480 # 480 px height
+    .long 32 # 32 bits per pixel
 .align 8
 endTag:
     .word 0 # Type = End

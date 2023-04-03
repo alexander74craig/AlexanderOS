@@ -33,7 +33,7 @@ BootInformation::BootInformation(void* ebx)
             framebufferBitsPerPixel = readUint8(ebx);
             framebufferType = readUint8(ebx);
             // Reserved byte
-            readUint8(ebx);
+            readUint16(ebx);
 
             if (framebufferType == 1)
             {
@@ -44,7 +44,8 @@ BootInformation::BootInformation(void* ebx)
                 framebufferBlueFieldPosition = readUint8(ebx);
                 framebufferBlueMaskSize = readUint8(ebx);
                 // Alignment padding
-                readUint32(ebx);
+                readUint16(ebx);
+                readUint8(ebx);
             }
             else
             {

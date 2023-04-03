@@ -1,34 +1,36 @@
 #include "DirectDisplay.hpp"
 
-DirectDisplay::DirectDisplay(uint64_t address, uint32_t width, uint32_t height) : 
-        myAddress{(uint32_t*)address},
-        myHeight{height},
-        myWidth{width},
-        myMaxAddress{(uint32_t*)myAddress + (myWidth * myHeight)},
-        myColumn{0},
-        myRow{0}
+DirectDisplay::DirectDisplay(BootInformation bootInformation) : 
+    myWidth{bootInformation.framebufferWidth},
+    myHeight{bootInformation.framebufferHeight},
+    myPitch{bootInformation.framebufferPitch},
+    myRedFieldPosition{bootInformation.framebufferRedFieldPosition},
+    myRedMaskSize{bootInformation.framebufferRedMaskSize},
+    myGreenFieldPosition{bootInformation.framebufferGreenFieldPosition},
+    myGreenMaskSize{bootInformation.framebufferGreenMaskSize},
+    myBlueFieldPosition{bootInformation.framebufferBlueFieldPosition},
+    myBlueMaskSize{bootInformation.framebufferBlueMaskSize},
+    myAddress{(uint8_t*)bootInformation.framebufferAddress},
+    myMaxAddress{myAddress + (myPitch * myHeight)},
+    myColumn{0},
+    myRow{0}
 {
+    //TODO: Check bits per pixel, mask size, and 
     clearScreen();
 }
 
-#pragma pack(push, 1)
-struct pixelColor
-{
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-    
-};
-#pragma pack(pop)
 
-void DirectDisplay::writeChar(uint32_t xPos, uint32_t yPos, char character)
+#define White Color{0xff, 0xff, 0xff} 
+
+void DirectDisplay::writeChar(uint32_t xPos, uint32_t yPos, char character, Color color = Color(0xff, 0xff, 0xff))
 {
     if (xPos >= myWidth/8 || yPos >= myHeight/16)
     {
         return;
     }
- 
-    uint32_t* currentAddress = myAddress + (xPos * 8 + yPos * 16 * myWidth);
+
+    uint32_t* currentAddress = (uint32_t*)(myAddress + (xPos * 8 * 4 + yPos * 16 * myPitch));
+
     // Font.s
     extern uint8_t fontGlyphs[];
     uint8_t* characterRow = &fontGlyphs[character * 16];
@@ -37,7 +39,10 @@ void DirectDisplay::writeChar(uint32_t xPos, uint32_t yPos, char character)
     {
         if ((*characterRow >> (7 - iGlyphPixel % 8)) & 1)
         {
-            *currentAddress = 0xffffffff;
+            uint32_t printColor = color.red << myRedFieldPosition | 
+                color.green << myGreenFieldPosition | 
+                color.blue << myBlueFieldPosition;
+            *currentAddress = printColor;
         }
         else
         {
@@ -47,7 +52,7 @@ void DirectDisplay::writeChar(uint32_t xPos, uint32_t yPos, char character)
 
         if ((iGlyphPixel + 1) % 8 == 0)
         {
-            currentAddress += myWidth - 8;
+            currentAddress = (uint32_t*)((uint8_t*)currentAddress + myPitch) - 8;
             characterRow++;
         }
     }
@@ -56,7 +61,7 @@ void DirectDisplay::writeChar(uint32_t xPos, uint32_t yPos, char character)
 
 void DirectDisplay::clearScreen()
 {
-    uint32_t* currentAddress = myAddress;
+    uint8_t* currentAddress = myAddress;
     while (currentAddress != myMaxAddress)
     {
         *currentAddress = 0x0;
@@ -68,10 +73,10 @@ void DirectDisplay::clearScreen()
 
 void DirectDisplay::scrollText()
 {
-    uint32_t* currentAddress = myAddress;
-    while (currentAddress != (myMaxAddress - myWidth * 8))
+    uint8_t* currentAddress = myAddress;
+    while (currentAddress != (myMaxAddress - myPitch * 16))
     {
-        *currentAddress = *(currentAddress + myWidth * 8);
+        *currentAddress = *(currentAddress + myPitch * 16);
         currentAddress++;
     }
     while (currentAddress != myMaxAddress)

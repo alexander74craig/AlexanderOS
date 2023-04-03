@@ -20,8 +20,8 @@ AlexanderOS.iso : AlexanderOS.bin
 	grub-mkrescue -o AlexanderOS.iso $(ISO_DIR)
 
 # Links together OS
-AlexanderOS.bin : kernel.o Boot.o Boot.ld IDT.o ISR.o VGATextModeBuffer.o BootInformation.o DirectDisplay.o Font.o
-	 $(CXX) -T Boot.ld -o AlexanderOS.bin kernel.o Boot.o IDT.o ISR.o BootInformation.o VGATextModeBuffer.o DirectDisplay.o Font.o $(CXXFLAGS) 
+AlexanderOS.bin : kernel.o Boot.o Boot.ld IDT.o ISR.o VGATextModeBuffer.o BootInformation.o DirectDisplay.o Font.o Color.o
+	 $(CXX) -T Boot.ld -o AlexanderOS.bin kernel.o Boot.o IDT.o ISR.o BootInformation.o VGATextModeBuffer.o DirectDisplay.o Font.o Color.o $(CXXFLAGS) 
 
 # Compiles idt
 IDT.o : IDT.cpp
@@ -53,6 +53,10 @@ DirectDisplay.o : DirectDisplay.cpp
 # Font
 Font.o : Font.s
 	$(AS) Font.s -o Font.o
+
+# Color
+Color.o : Color.cpp
+	$(CXX) -c Color.cpp -o Color.o $(CXXFLAGS)
 
 # Cleans the directory by removing any build objects
 clean :

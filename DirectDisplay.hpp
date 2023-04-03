@@ -1,15 +1,26 @@
 #pragma once
 
 #include <stdint.h>
+#include "Color.hpp"
+#include "BootInformation.hpp"
 
 // 16 bit color depth display
 class DirectDisplay
 {
 private:
-    uint32_t* const myAddress;
-    const uint32_t myHeight;
+    uint8_t* const myAddress;
+    uint8_t* const myMaxAddress;
+
     const uint32_t myWidth;
-    uint32_t* const myMaxAddress;
+    const uint32_t myHeight;
+    const uint32_t myPitch;
+
+    const uint8_t myRedFieldPosition;
+    const uint8_t myRedMaskSize;
+    const uint8_t myGreenFieldPosition;
+    const uint8_t myGreenMaskSize;
+    const uint8_t myBlueFieldPosition;
+    const uint8_t myBlueMaskSize;
 
     // Current position on screen.
     uint32_t myColumn; 
@@ -17,11 +28,11 @@ private:
 
     void writeHexNibble(uint8_t nibble);
 
-    void writeChar(uint32_t xPos, uint32_t yPos, char character);
+    void writeChar(const uint32_t xPos, const uint32_t yPos, char character, const Color color);
 
 public:
     // Default constructor, clears the screen.
-    DirectDisplay(uint64_t address,  uint32_t width, uint32_t height);
+    DirectDisplay(BootInformation bootInformation);
 
     void writeHexByte(uint8_t byte);
 

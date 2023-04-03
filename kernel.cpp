@@ -15,14 +15,33 @@ void main(uint32_t eax, void* ebx)
 
     BootInformation bootInformation(ebx);
     
-    DirectDisplay display(bootInformation.framebufferAddress, bootInformation.framebufferWidth, bootInformation.framebufferHeight);
+    DirectDisplay display(bootInformation);
     
-    display.writeString("Alexander OS!\n");
-    display.writeString("1234567890-=\n");
-    display.writeString("!@#$%^&*()_+\n");
-    display.writeString("[]\\;',./{}|:\">?~`\n");
-    display.writeString("the quick brown fox jumps over the lazy dog.\n");
-    display.writeString("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG!\n");
+    display.writeHex64(bootInformation.framebufferAddress);
+    display.writeString(" - address \n");
+    display.writeHexLong(bootInformation.framebufferWidth);
+    display.writeString(" - width \n");
+    display.writeHexLong(bootInformation.framebufferHeight);
+    display.writeString(" - height \n");
+    display.writeHexByte(bootInformation.framebufferBitsPerPixel);
+    display.writeString(" - BPP \n");
+
+    display.writeHexByte(bootInformation.framebufferType);
+    display.writeString(" - type \n");
+
+    display.writeHexByte(bootInformation.framebufferRedFieldPosition);
+    display.writeString(" - RedFieldPosition \n");
+    display.writeHexByte(bootInformation.framebufferGreenFieldPosition);
+    display.writeString(" - GreenFieldPosition \n");
+    display.writeHexByte(bootInformation.framebufferBlueFieldPosition);
+    display.writeString(" - BlueFieldPosition \n");
+
+    display.writeHexByte(bootInformation.framebufferRedMaskSize);
+    display.writeString(" - RedMaskSize \n");
+    display.writeHexByte(bootInformation.framebufferGreenMaskSize);
+    display.writeString(" - GreenMaskSize \n");
+    display.writeHexByte(bootInformation.framebufferBlueMaskSize);
+    display.writeString(" - BlueMaskSize \n");
     return;
 }
 }
