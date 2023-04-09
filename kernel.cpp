@@ -4,44 +4,22 @@ extern "C"
 #include "BootInformation.hpp"
 #include "DirectDisplay.hpp"
 
-void main(uint32_t eax, void* ebx) 
+void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMagicNumber, void* grubBootInformationAddress) 
 {
 
-    if (eax != 0x36d76289)
+    if (grubMagicNumber != 0x36d76289)
     {
         //TODO: Invalid bootloader magic number.
         return;
     }
-
-    BootInformation bootInformation(ebx);
-    
+    BootInformation bootInformation(grubBootInformationAddress);
     DirectDisplay display(bootInformation);
     
-    display.writeHex64(bootInformation.framebufferAddress);
-    display.writeString(" - address \n");
-    display.writeHexLong(bootInformation.framebufferWidth);
-    display.writeString(" - width \n");
-    display.writeHexLong(bootInformation.framebufferHeight);
-    display.writeString(" - height \n");
-    display.writeHexByte(bootInformation.framebufferBitsPerPixel);
-    display.writeString(" - BPP \n");
 
-    display.writeHexByte(bootInformation.framebufferType);
-    display.writeString(" - type \n");
-
-    display.writeHexByte(bootInformation.framebufferRedFieldPosition);
-    display.writeString(" - RedFieldPosition \n");
-    display.writeHexByte(bootInformation.framebufferGreenFieldPosition);
-    display.writeString(" - GreenFieldPosition \n");
-    display.writeHexByte(bootInformation.framebufferBlueFieldPosition);
-    display.writeString(" - BlueFieldPosition \n");
-
-    display.writeHexByte(bootInformation.framebufferRedMaskSize);
-    display.writeString(" - RedMaskSize \n");
-    display.writeHexByte(bootInformation.framebufferGreenMaskSize);
-    display.writeString(" - GreenMaskSize \n");
-    display.writeHexByte(bootInformation.framebufferBlueMaskSize);
-    display.writeString(" - BlueMaskSize \n");
-    return;
+    display.writeHexLong(cpuidFeaturesECX);
+    display.writeString(" - cpuid features ECX \n");
+    display.writeHexLong(cpuidFeaturesEDX);
+    display.writeString(" - cpuid features EDX \n");
+    (cpuidFeaturesEDX & 0x200) ? display.writeString("Has APIC\n") : display.writeString("Does not have APIC\n");
 }
 }

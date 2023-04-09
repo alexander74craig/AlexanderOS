@@ -56,13 +56,40 @@ _start:
     mov %dx, %fs
     mov $stack_top, %esp # Sets the top of the stack
 
-    push %ebx # Pushes EBX as an argument to main
-    push %eax # Pushes EAX as an argument to main
+    push %ebx # Pushes EBX as an argument to main storing information from the GRUB bootloader
+    push %eax # Pushes EAX as an argument to main storing the magic number from the GRUB bootloader.
+
+    # Sets EAX to 1 before querying cpuid to indicate that we want cpuid to get features.
+    mov $1, %eax
+    cpuid
+    # Pushes the results of cpuid onto the stack
+    push %ecx
+    push %edx 
 
     # Initialize the IDT so that interrupts can be handled
     call initializeInterruptDescriptorTable
 
-    # Disable the IRQ
+    # Start initialization of PICs
+    mov $0x11, %al
+    out %al, $0x20
+    out %al, $0xa0
+    # Set offset for master PIC, such that it starts at 32
+    mov $0x21, %al
+    out %al, $0x21
+    # Set offset for slave PIC, such that it starts at 40
+    mov $0x28, %al
+    out %al, $0xa1
+    # Set location of slave PIC for the master PIC
+    mov $4, %al
+    out %al, $0x21
+    # Set location of master PIC for the slave PIC
+    mov $2, %al
+    out %al, $0xa1
+    # Set 8086 mode for both PICS
+    mov $0x01, %al
+    out %al, $0x21
+    out %al, $0xa1
+    # Masking the entire PIC
     mov $0xff, %al
     out %al, $0x21
     out %al, $0xa1
