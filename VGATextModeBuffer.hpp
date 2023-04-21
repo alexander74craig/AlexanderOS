@@ -1,6 +1,8 @@
+#pragma once
 #include <stdint.h>
+#include "TextBuffer.hpp"
 
-class VGATextModeBuffer
+class VGATextModeBuffer : public TextBuffer
 {
 private:
     // Current position on screen.
@@ -16,18 +18,11 @@ public:
     // Default constructor, clears the screen.
     VGATextModeBuffer();
 
-    void writeHexByte(uint8_t byte);
+    ~VGATextModeBuffer() override = default;
 
-    void writeHexWord(uint16_t word);
-
-    void writeHexLong(uint32_t longInt);
-
-    // Writes a character at the current position and handles scrolling.
-    void writeChar(char character);
-
-    // Writes a string at the current position and handles scrolling.
-    void writeString(char* string);
+    // Writes a character at the current position.
+    void writeChar(char character) override;
 
     // Clears the screen and sets current position to 0,0.
-    void clearScreen();
+    void clearScreen() override;
 };

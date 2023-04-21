@@ -1,11 +1,12 @@
 #pragma once
 
 #include <stdint.h>
+#include "TextBuffer.hpp"
 #include "Color.hpp"
 #include "BootInformation.hpp"
 
 // 16 bit color depth display
-class DirectDisplay
+class DirectDisplay : public TextBuffer 
 {
 private:
     uint8_t* const myAddress;
@@ -28,30 +29,19 @@ private:
 
     void writeHexNibble(uint8_t nibble);
 
-    void writeChar(const uint32_t xPos, const uint32_t yPos, char character, const Color color);
+    void printChar(const uint32_t xPos, const uint32_t yPos, char character);
 
+    void scrollText();
+    
 public:
     // Default constructor, clears the screen.
     DirectDisplay(BootInformation bootInformation);
 
-    void writeHexByte(uint8_t byte);
-
-    void writeHexWord(uint16_t word);
-
-    void writeHexLong(uint32_t longInt);
-
-    void writeHex64(uint64_t int64);
+    ~DirectDisplay() override = default;
 
     // Writes a character at the current position and handles scrolling.
-    void writeChar(char character);
-
-    // Writes a string at the current position and handles scrolling.
-    void writeString(char* string);
+    void writeChar(char character) override;
 
     // Clears the screen and sets current position to 0,0.
-    void clearScreen();
-
-    void scrollText();
-
-
+    void clearScreen() override;
 };

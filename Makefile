@@ -20,8 +20,8 @@ AlexanderOS.iso : AlexanderOS.bin
 	grub-mkrescue -o AlexanderOS.iso $(ISO_DIR)
 
 # Links together OS
-AlexanderOS.bin : kernel.o Boot.o Boot.ld IDT.o ISR.o VGATextModeBuffer.o BootInformation.o DirectDisplay.o Font.o Color.o
-	 $(CXX) -T Boot.ld -o AlexanderOS.bin kernel.o Boot.o IDT.o ISR.o BootInformation.o VGATextModeBuffer.o DirectDisplay.o Font.o Color.o $(CXXFLAGS) 
+AlexanderOS.bin : kernel.o Boot.o Boot.ld IDT.o ISR.o VGATextModeBuffer.o BootInformation.o DirectDisplay.o Font.o Color.o TextBuffer.o CPPSupport.o
+	 $(CXX) -T Boot.ld -o AlexanderOS.bin kernel.o Boot.o IDT.o ISR.o BootInformation.o VGATextModeBuffer.o DirectDisplay.o Font.o Color.o TextBuffer.o CPPSupport.o $(CXXFLAGS) 
 
 # Compiles idt
 IDT.o : IDT.cpp
@@ -50,6 +50,10 @@ BootInformation.o : BootInformation.cpp
 DirectDisplay.o : DirectDisplay.cpp 
 	$(CXX) -c DirectDisplay.cpp -o DirectDisplay.o $(CXXFLAGS)
 
+# Text buffer parent class
+TextBuffer.o : TextBuffer.cpp
+	$(CXX) -c TextBuffer.cpp -o TextBuffer.o $(CXXFLAGS)
+
 # Font
 Font.o : Font.s
 	$(AS) Font.s -o Font.o
@@ -57,6 +61,10 @@ Font.o : Font.s
 # Color
 Color.o : Color.cpp
 	$(CXX) -c Color.cpp -o Color.o $(CXXFLAGS)
+
+# c++ language support functions
+CPPSupport.o : CPPSupport.cpp
+	$(CXX) -c CPPSupport.cpp -o CPPSupport.o $(CXXFLAGS)
 
 # Cleans the directory by removing any build objects
 clean :

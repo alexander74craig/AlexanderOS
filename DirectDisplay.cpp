@@ -19,15 +19,14 @@ DirectDisplay::DirectDisplay(BootInformation bootInformation) :
     clearScreen();
 }
 
-
-#define White Color{0xff, 0xff, 0xff} 
-
-void DirectDisplay::writeChar(uint32_t xPos, uint32_t yPos, char character, Color color = Color(0xff, 0xff, 0xff))
+void DirectDisplay::printChar(uint32_t xPos, uint32_t yPos, char character)
 {
     if (xPos >= myWidth/8 || yPos >= myHeight/16)
     {
         return;
     }
+
+    Color color{0xff, 0xff, 0xff};
 
     uint32_t* currentAddress = (uint32_t*)(myAddress + (xPos * 8 * 4 + yPos * 16 * myPitch));
 
@@ -86,50 +85,6 @@ void DirectDisplay::scrollText()
     }
 }
 
-void DirectDisplay::writeHexNibble(uint8_t nibble)
-{
-    if (nibble < 10)   
-    {
-        writeChar(nibble + 48);
-    }
-    else
-    {
-        writeChar(nibble + 55);
-    }
-}
-
-void DirectDisplay::writeHexByte(uint8_t byte)
-{
-    uint8_t lower = 0xF & byte;
-    uint8_t upper = byte >> 4;
-    writeHexNibble(upper);
-    writeHexNibble(lower);
-}
-
-void DirectDisplay::writeHexWord(uint16_t word)
-{
-    uint8_t lower = 0xFF & word;
-    uint8_t upper = word >> 8;
-    writeHexByte(upper);
-    writeHexByte(lower);
-}
-
-void DirectDisplay::writeHexLong(uint32_t longInt)
-{
-    uint16_t lower = 0xFFFF & longInt;
-    uint16_t upper = longInt >> 16;
-    writeHexWord(upper);
-    writeHexWord(lower);
-}
-
-void DirectDisplay::writeHex64(uint64_t int64)
-{
-    uint32_t lower = 0xFFFFFFFF & int64;
-    uint32_t upper = int64 >> 32;
-    writeHexLong(upper);
-    writeHexLong(lower);
-}
-
 void DirectDisplay::writeChar(char character)
 {
     if (character == '\n')
@@ -139,7 +94,7 @@ void DirectDisplay::writeChar(char character)
     }
     else 
     {
-        writeChar(myColumn, myRow, character);
+        printChar(myColumn, myRow, character);
         myColumn++;
     }
 
@@ -153,13 +108,5 @@ void DirectDisplay::writeChar(char character)
         scrollText();
         myColumn = 0;
         myRow = myHeight/16 - 1;
-    }
-}
-
-void DirectDisplay:: writeString(char* string)
-{
-    for (uint32_t charIndex{0}; string[charIndex]; charIndex++)
-    {
-        writeChar(string[charIndex]);
     }
 }
