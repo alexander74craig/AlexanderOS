@@ -19,7 +19,10 @@ SECTIONS
 	}
 	.bss BLOCK(4K) : ALIGN(4K)
 	{
-		*(COMMON)
 		*(.bss)
+	}
+	.stack BLOCK(4k) : ALIGN (4k)
+	{
+		*(.stack)
 	}
 }

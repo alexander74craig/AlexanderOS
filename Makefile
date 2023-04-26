@@ -2,6 +2,8 @@
 AS= ~/cross/bin/i686-elf-as 
 CC= ~/cross/bin/i686-elf-gcc
 CXX= ~/cross/bin/i686-elf-g++ 
+
+# Variables not dependent on host machine
 CXXFLAGS= -ffreestanding -Wall -Wextra -fno-rtti -nostdlib -nodefaultlibs -lgcc -fno-exceptions
 ISO_DIR= isodir
 

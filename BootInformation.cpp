@@ -32,9 +32,9 @@ BootInformation::BootInformation(void* ebx)
             framebufferHeight = readUint32(ebx);
             framebufferBitsPerPixel = readUint8(ebx);
             framebufferType = readUint8(ebx);
-            // Reserved byte
+            // Reserved 2 bytes
             readUint16(ebx);
-
+            // Direct Display type
             if (framebufferType == 1)
             {
                 framebufferRedFieldPosition = readUint8(ebx);
@@ -47,6 +47,7 @@ BootInformation::BootInformation(void* ebx)
                 readUint16(ebx);
                 readUint8(ebx);
             }
+            // Not direct display type
             else
             {
                 framebufferRedFieldPosition = 0;
@@ -60,6 +61,13 @@ BootInformation::BootInformation(void* ebx)
                 ebx = (uint8_t*)ebx + dataSize;      
             }
         }
+        // Memory map
+        else if (type == 4)
+        {
+            hasBasicsMemoryInformation = true;
+            memoryLowerAddress = readUint32(ebx);
+            memoryUpperAddress = readUint32(ebx);
+        }
         else 
         {
             // Skips over the current data section
@@ -69,6 +77,8 @@ BootInformation::BootInformation(void* ebx)
         currentSize += dataSize + 8;
     }
 }
+
+
 
 uint64_t BootInformation::readUint64(void*& ebx)
 {

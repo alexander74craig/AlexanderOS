@@ -13,6 +13,7 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
         //TODO: Invalid bootloader magic number.
         return;
     }
+
     BootInformation bootInformation(grubBootInformationAddress);
 
     if (bootInformation.framebufferType == 2)
@@ -23,7 +24,19 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
     else if (bootInformation.framebufferType == 1)
     {
         DirectDisplay textBuffer{bootInformation};
-        textBuffer.writeString("Direct display text buffer.");
+        textBuffer.writeString("Direct display text buffer.\n");
+        if (bootInformation.hasBasicsMemoryInformation)
+        {
+            textBuffer.writeString("Memory upper address :");
+            textBuffer.writeHex(bootInformation.memoryLowerAddress);
+            textBuffer.writeString("\nMemory lower address :");
+            textBuffer.writeHex(bootInformation.memoryUpperAddress);
+        }
+        else
+        {
+            textBuffer.writeString("Has no basic memory information.");
+            return;
+        }
     }  
 
 }

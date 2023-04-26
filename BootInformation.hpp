@@ -29,6 +29,10 @@ public:
     uint8_t framebufferBlueFieldPosition;
     uint8_t framebufferBlueMaskSize;
 
+    bool hasBasicsMemoryInformation = false;
+    uint32_t memoryUpperAddress;
+    uint32_t memoryLowerAddress;
+
 private:
     uint64_t readUint64(void*& ebx);
 
