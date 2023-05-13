@@ -1,22 +1,21 @@
 #include "DirectDisplay.hpp"
 
 DirectDisplay::DirectDisplay(BootInformation bootInformation) : 
+    myAddress{(uint8_t*)bootInformation.framebufferAddress},
     myWidth{bootInformation.framebufferWidth},
     myHeight{bootInformation.framebufferHeight},
     myPitch{bootInformation.framebufferPitch},
+    myMaxAddress{myAddress + (myPitch * myHeight)},
     myRedFieldPosition{bootInformation.framebufferRedFieldPosition},
     myRedMaskSize{bootInformation.framebufferRedMaskSize},
     myGreenFieldPosition{bootInformation.framebufferGreenFieldPosition},
     myGreenMaskSize{bootInformation.framebufferGreenMaskSize},
     myBlueFieldPosition{bootInformation.framebufferBlueFieldPosition},
     myBlueMaskSize{bootInformation.framebufferBlueMaskSize},
-    myAddress{(uint8_t*)bootInformation.framebufferAddress},
-    myMaxAddress{myAddress + (myPitch * myHeight)},
     myColumn{0},
     myRow{0}
 {
-    //TODO: Check bits per pixel, mask size, and 
-    clearScreen();
+    //TODO: Check bits per pixel, mask size, and
 }
 
 void DirectDisplay::printChar(uint32_t xPos, uint32_t yPos, char character)

@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <stdint.h>
 
@@ -30,8 +30,8 @@ public:
     uint8_t framebufferBlueMaskSize;
 
     bool hasBasicsMemoryInformation = false;
-    uint32_t memoryUpperAddress;
-    uint32_t memoryLowerAddress;
+    uint32_t memoryUpper;
+    uint32_t memoryLower;
 
 private:
     uint64_t readUint64(void*& ebx);

@@ -10,11 +10,10 @@ class DirectDisplay : public TextBuffer
 {
 private:
     uint8_t* const myAddress;
-    uint8_t* const myMaxAddress;
-
     const uint32_t myWidth;
     const uint32_t myHeight;
     const uint32_t myPitch;
+    uint8_t* const myMaxAddress;
 
     const uint8_t myRedFieldPosition;
     const uint8_t myRedMaskSize;
@@ -27,15 +26,13 @@ private:
     uint32_t myColumn; 
     uint32_t myRow;
 
-    void writeHexNibble(uint8_t nibble);
-
-    void printChar(const uint32_t xPos, const uint32_t yPos, char character);
+    void printChar(uint32_t xPos, uint32_t yPos, char character);
 
     void scrollText();
     
 public:
     // Default constructor, clears the screen.
-    DirectDisplay(BootInformation bootInformation);
+    explicit DirectDisplay(BootInformation bootInformation);
 
     ~DirectDisplay() override = default;
 

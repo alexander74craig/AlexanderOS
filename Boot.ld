@@ -2,7 +2,7 @@ ENTRY(_start)
 SECTIONS
 {
 	. = 1M; /* Sets the location in memory to 1 MiB*/
- 
+    kernelStart = .;
 	/* Align all sections on 4 KiB boundaries*/
 	.text BLOCK(4K) : ALIGN(4K)
 	{
@@ -25,4 +25,5 @@ SECTIONS
 	{
 		*(.stack)
 	}
+	kernelEnd = .;
 }

@@ -65,8 +65,8 @@ BootInformation::BootInformation(void* ebx)
         else if (type == 4)
         {
             hasBasicsMemoryInformation = true;
-            memoryLowerAddress = readUint32(ebx);
-            memoryUpperAddress = readUint32(ebx);
+            memoryLower = readUint32(ebx);
+            memoryUpper = readUint32(ebx);
         }
         else 
         {
