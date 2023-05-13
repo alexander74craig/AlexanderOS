@@ -1,9 +1,7 @@
 #include "PhysicalMemoryManager.hpp"
 #include "TextBuffer.hpp"
 
-PhysicalMemoryManager::PhysicalMemoryManager(const BootInformation& bootInformation,
-        TextBuffer& textBuffer) :
-        myTextBuffer{textBuffer}
+PhysicalMemoryManager::PhysicalMemoryManager(const BootInformation& bootInformation)
 {
     extern uint32_t kernelEnd;
     uint32_t kernelEndValue = (uint32_t) (&kernelEnd);

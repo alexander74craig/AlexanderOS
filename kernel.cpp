@@ -26,7 +26,7 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
     {
         DirectDisplay textBuffer{bootInformation};
         textBuffer.writeString("Direct display text buffer.");
-        PhysicalMemoryManager physicalMemoryManager(bootInformation, textBuffer);
+        PhysicalMemoryManager physicalMemoryManager(bootInformation);
         uint8_t* address = (uint8_t*)physicalMemoryManager.allocateAddress();
         textBuffer.writeString("\nAddress allocated by the PMM: ");
         textBuffer.writeHex((uint32_t) address);
