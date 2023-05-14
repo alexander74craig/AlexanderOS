@@ -22,51 +22,17 @@ BootInformation::BootInformation(void* ebx)
         {
             dataSize = dataSize + (8 - (dataSize % 8));
         }
-
-        // Framebuffer Tag
         if (type == 8)
         {
-            framebufferAddress = readUint64(ebx);
-            framebufferPitch = readUint32(ebx);
-            framebufferWidth = readUint32(ebx);
-            framebufferHeight = readUint32(ebx);
-            framebufferBitsPerPixel = readUint8(ebx);
-            framebufferType = readUint8(ebx);
-            // Reserved 2 bytes
-            readUint16(ebx);
-            // Direct Display type
-            if (framebufferType == 1)
-            {
-                framebufferRedFieldPosition = readUint8(ebx);
-                framebufferRedMaskSize = readUint8(ebx);
-                framebufferGreenFieldPosition =readUint8(ebx);
-                framebufferGreenMaskSize = readUint8(ebx);
-                framebufferBlueFieldPosition = readUint8(ebx);
-                framebufferBlueMaskSize = readUint8(ebx);
-                // Alignment padding
-                readUint16(ebx);
-                readUint8(ebx);
-            }
-            // Not direct display type
-            else
-            {
-                framebufferRedFieldPosition = 0;
-                framebufferRedMaskSize = 0;
-                framebufferGreenFieldPosition = 0;
-                framebufferGreenMaskSize = 0;
-                framebufferBlueFieldPosition = 0;
-                framebufferBlueMaskSize = 0;
-                // Alignment padding
-                dataSize -= 22;
-                ebx = (uint8_t*)ebx + dataSize;      
-            }
+            readFramebuffer(ebx, dataSize);
         }
-        // Memory map
         else if (type == 4)
         {
-            hasBasicsMemoryInformation = true;
-            memoryLower = readUint32(ebx);
-            memoryUpper = readUint32(ebx);
+            readBasicMemoryInformation(ebx);
+        }
+        else if (type == 6)
+        {
+            readMemoryMap(ebx, dataSize);
         }
         else 
         {
@@ -103,4 +69,67 @@ uint8_t BootInformation::readUint8(void*& ebx)
     uint8_t returnInt{*(uint8_t*)ebx};
     ebx = (uint8_t*)ebx + 1;
     return returnInt;
+}
+
+void BootInformation::readFramebuffer(void*& ebx, uint32_t dataSize)
+{
+    framebufferAddress = readUint64(ebx);
+    framebufferPitch = readUint32(ebx);
+    framebufferWidth = readUint32(ebx);
+    framebufferHeight = readUint32(ebx);
+    framebufferBitsPerPixel = readUint8(ebx);
+    framebufferType = readUint8(ebx);
+    // Reserved 2 bytes
+    readUint16(ebx);
+    // Direct Display type
+    if (framebufferType == 1)
+    {
+        framebufferRedFieldPosition = readUint8(ebx);
+        framebufferRedMaskSize = readUint8(ebx);
+        framebufferGreenFieldPosition =readUint8(ebx);
+        framebufferGreenMaskSize = readUint8(ebx);
+        framebufferBlueFieldPosition = readUint8(ebx);
+        framebufferBlueMaskSize = readUint8(ebx);
+        // Alignment padding
+        readUint16(ebx);
+        readUint8(ebx);
+    }
+        // Not direct display type
+    else
+    {
+        framebufferRedFieldPosition = 0;
+        framebufferRedMaskSize = 0;
+        framebufferGreenFieldPosition = 0;
+        framebufferGreenMaskSize = 0;
+        framebufferBlueFieldPosition = 0;
+        framebufferBlueMaskSize = 0;
+        // Alignment padding
+        dataSize -= 22;
+        ebx = (uint8_t*)ebx + dataSize;
+    }
+}
+
+void BootInformation::readBasicMemoryInformation(void*& ebx)
+{
+    hasBasicsMemoryInformation = true;
+    memoryLower = readUint32(ebx);
+    memoryUpper = readUint32(ebx);
+}
+void BootInformation::readMemoryMap(void*& ebx,  uint32_t dataSize)
+{
+    //Entry size presumed to be 24
+    readUint32(ebx);
+    // Entry version presumed to be 0
+    readUint32(ebx);
+
+    uint32_t entriesSize{dataSize - 8};
+    for (uint32_t entryIndex{0}; entryIndex < entriesSize/24; entryIndex++)
+    {
+        MemoryMapEntry* entry = memoryMapEntries + entryIndex;
+        entry->baseAddress = readUint64(ebx);
+        entry->length = readUint64(ebx);
+        entry->type = readUint32(ebx);
+        readUint32(ebx); // Reserved
+    }
+
 }

@@ -26,13 +26,22 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
     {
         DirectDisplay textBuffer{bootInformation};
         textBuffer.writeString("Direct display text buffer.");
+
+        for (uint32_t memoryMapEntryIndex{0}; memoryMapEntryIndex < 32; memoryMapEntryIndex++)
+        {
+            auto* mapEntry = bootInformation.memoryMapEntries + memoryMapEntryIndex;
+            if(mapEntry->length == 0)
+            {
+                break;
+            }
+            textBuffer.writeString("\nAddress: ");
+            textBuffer.writeHex(mapEntry->baseAddress);
+            textBuffer.writeString(" ; Length: ");
+            textBuffer.writeHex(mapEntry->length);
+            textBuffer.writeString(" ; Type: ");
+            textBuffer.writeHex(mapEntry->type);
+        }
         PhysicalMemoryManager physicalMemoryManager(bootInformation);
-        uint8_t* address = (uint8_t*)physicalMemoryManager.allocateAddress();
-        textBuffer.writeString("\nAddress allocated by the PMM: ");
-        textBuffer.writeHex((uint32_t) address);
-        uint8_t* address2 = (uint8_t*)physicalMemoryManager.allocateAddress();
-        textBuffer.writeString("\nAddress2 allocated by the PMM: ");
-        textBuffer.writeHex((uint32_t) address2);
     }
 }
 }
