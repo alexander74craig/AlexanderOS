@@ -27,7 +27,7 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
         DirectDisplay textBuffer{bootInformation};
         textBuffer.writeString("Direct display text buffer.");
 
-        for (uint32_t memoryMapEntryIndex{0}; memoryMapEntryIndex < 32; memoryMapEntryIndex++)
+        for (uint32_t memoryMapEntryIndex{0}; memoryMapEntryIndex < 64; memoryMapEntryIndex++)
         {
             auto* mapEntry = bootInformation.memoryMapEntries + memoryMapEntryIndex;
             if(mapEntry->length == 0)
@@ -41,7 +41,7 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
             textBuffer.writeString(" ; Type: ");
             textBuffer.writeHex(mapEntry->type);
         }
-        PhysicalMemoryManager physicalMemoryManager(bootInformation);
+        PhysicalMemoryManager physicalMemoryManager(bootInformation, textBuffer);
     }
 }
 }

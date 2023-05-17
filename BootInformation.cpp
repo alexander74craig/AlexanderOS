@@ -123,7 +123,7 @@ void BootInformation::readMemoryMap(void*& ebx,  uint32_t dataSize)
     readUint32(ebx);
 
     uint32_t entriesSize{dataSize - 8};
-    for (uint32_t entryIndex{0}; entryIndex < entriesSize/24; entryIndex++)
+    for (uint32_t entryIndex{0}; (entryIndex < entriesSize/24) && (entryIndex < 64); entryIndex++)
     {
         MemoryMapEntry* entry = memoryMapEntries + entryIndex;
         entry->baseAddress = readUint64(ebx);
