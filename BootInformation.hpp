@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdint.h>
-#include "MemoryMapEntry.hpp"
 
 
 class BootInformation
@@ -33,9 +32,6 @@ public:
     bool hasBasicsMemoryInformation = false;
     uint32_t memoryUpper;
     uint32_t memoryLower;
-
-    // Memory map = 6
-    MemoryMapEntry memoryMapEntries[64];
 
 private:
     uint64_t readUint64(void*& ebx);

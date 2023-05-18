@@ -30,10 +30,6 @@ BootInformation::BootInformation(void* ebx)
         {
             readBasicMemoryInformation(ebx);
         }
-        else if (type == 6)
-        {
-            readMemoryMap(ebx, dataSize);
-        }
         else 
         {
             // Skips over the current data section
@@ -114,22 +110,4 @@ void BootInformation::readBasicMemoryInformation(void*& ebx)
     hasBasicsMemoryInformation = true;
     memoryLower = readUint32(ebx);
     memoryUpper = readUint32(ebx);
-}
-void BootInformation::readMemoryMap(void*& ebx,  uint32_t dataSize)
-{
-    //Entry size presumed to be 24
-    readUint32(ebx);
-    // Entry version presumed to be 0
-    readUint32(ebx);
-
-    uint32_t entriesSize{dataSize - 8};
-    for (uint32_t entryIndex{0}; (entryIndex < entriesSize/24) && (entryIndex < 64); entryIndex++)
-    {
-        MemoryMapEntry* entry = memoryMapEntries + entryIndex;
-        entry->baseAddress = readUint64(ebx);
-        entry->length = readUint64(ebx);
-        entry->type = readUint32(ebx);
-        readUint32(ebx); // Reserved
-    }
-
 }

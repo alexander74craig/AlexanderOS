@@ -19,7 +19,6 @@ PhysicalMemoryManager::PhysicalMemoryManager(const BootInformation& bootInformat
     // Number of blocks necessary to store the kernel
     uint32_t kernelBlocks =  (kernelEndValue - oneMiB + 4095)/4096;
 
-
     // Address of bitmap
     myBitMap = (uint32_t*)(oneMiB + (4096 * kernelBlocks));
 
@@ -30,23 +29,6 @@ PhysicalMemoryManager::PhysicalMemoryManager(const BootInformation& bootInformat
     {
         uint32_t* currentBitMap = myBitMap + blockMap;
         *currentBitMap = 0;
-    }
-    uint32_t mapIndex{0};
-    while ((bootInformation.memoryMapEntries[mapIndex].length != 0) && (mapIndex < 64))
-    {
-        auto& mapEntry = bootInformation.memoryMapEntries[mapIndex];
-        // If map entry is not usable memory, reserve all affected blocks.
-        if ((mapEntry.type != 1) && (mapEntry.baseAddress > oneMiB))
-        {
-            uint32_t startBlock = (mapEntry.baseAddress - oneMiB) / 4096;
-            uint32_t endBlock = (mapEntry.baseAddress + mapEntry.length - oneMiB - 1) / 4096;
-            while (startBlock <= endBlock && startBlock < myTotalBlocks)
-            {
-                reserveBlock(startBlock);
-                startBlock++;
-            }
-        }
-        mapIndex++;
     }
     for (uint32_t blockID{0}; blockID < usedBlocks; blockID++)
     {

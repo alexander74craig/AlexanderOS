@@ -69,27 +69,7 @@ _start:
     # Initialize the IDT so that interrupts can be handled
     call initializeInterruptDescriptorTable
 
-    # Start initialization of PICs
-    mov $0x11, %al
-    out %al, $0x20
-    out %al, $0xa0
-    # Set offset for master PIC, such that it starts at 32
-    mov $0x21, %al
-    out %al, $0x21
-    # Set offset for slave PIC, such that it starts at 40
-    mov $0x28, %al
-    out %al, $0xa1
-    # Set location of slave PIC for the master PIC
-    mov $4, %al
-    out %al, $0x21
-    # Set location of master PIC for the slave PIC
-    mov $2, %al
-    out %al, $0xa1
-    # Set 8086 mode for both PICS
-    mov $0x01, %al
-    out %al, $0x21
-    out %al, $0xa1
-    # Masking the entire PIC
+    # Disabled the PIC
     mov $0xff, %al
     out %al, $0x21
     out %al, $0xa1

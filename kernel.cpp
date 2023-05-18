@@ -26,22 +26,12 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
     {
         DirectDisplay textBuffer{bootInformation};
         textBuffer.writeString("Direct display text buffer.");
-
-        for (uint32_t memoryMapEntryIndex{0}; memoryMapEntryIndex < 64; memoryMapEntryIndex++)
-        {
-            auto* mapEntry = bootInformation.memoryMapEntries + memoryMapEntryIndex;
-            if(mapEntry->length == 0)
-            {
-                break;
-            }
-            textBuffer.writeString("\nAddress: ");
-            textBuffer.writeHex(mapEntry->baseAddress);
-            textBuffer.writeString(" ; Length: ");
-            textBuffer.writeHex(mapEntry->length);
-            textBuffer.writeString(" ; Type: ");
-            textBuffer.writeHex(mapEntry->type);
-        }
+        textBuffer.writeString("\nmemory lower: ");
+        textBuffer.writeHex(bootInformation.memoryLower);
+        textBuffer.writeString(" memory upper: ");
+        textBuffer.writeHex(bootInformation.memoryUpper);
         PhysicalMemoryManager physicalMemoryManager(bootInformation, textBuffer);
+
     }
 }
 }
