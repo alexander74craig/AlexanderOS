@@ -1,10 +1,9 @@
 #include "PhysicalMemoryManager.hpp"
-#include "TextBuffer.hpp"
 
-PhysicalMemoryManager::PhysicalMemoryManager(const BootInformation& bootInformation, TextBuffer& textBuffer)
+PhysicalMemoryManager::PhysicalMemoryManager(const BootInformation& bootInformation)
 {
     extern uint32_t kernelEnd;
-    uint32_t kernelEndValue = (uint32_t) (&kernelEnd);
+    uint32_t kernelEndValue = (uint32_t)(&kernelEnd);
 
     const uint32_t oneMiB = 1048576;
     const uint32_t bitsPer4KiBBlock = 32768;
@@ -22,7 +21,7 @@ PhysicalMemoryManager::PhysicalMemoryManager(const BootInformation& bootInformat
     // Address of bitmap
     myBitMap = (uint32_t*)(oneMiB + (4096 * kernelBlocks));
 
-    // Number of blocks to store bitmaps detailing the total amount of memory available
+    // Adds the number of blocks to store bitmaps detailing the available memory blocks
     uint32_t usedBlocks =  kernelBlocks + (myTotalBlocks + bitsPer4KiBBlock - 1) / bitsPer4KiBBlock;
 
     for (uint32_t blockMap{0}; blockMap < myTotalBlocks/32; blockMap++)
@@ -54,11 +53,14 @@ void* PhysicalMemoryManager::allocateAddress()
     uint32_t* blockBitArray = myBitMap + (myCurrentBlock / 32);
     for (uint32_t numberTested{0}; numberTested < myTotalBlocks; numberTested++)
     {
+        if (myCurrentBlock >= myTotalBlocks)
+        {
+            myCurrentBlock = 0;
+        }
         if((myCurrentBlock % 32) == 0)
         {
             blockBitArray = myBitMap + (myCurrentBlock / 32);
         }
-        //wrong
         if(!(*blockBitArray & (1 << myCurrentBlock % 32)))
         {
             reserveBlock(myCurrentBlock);

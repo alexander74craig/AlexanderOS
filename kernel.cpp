@@ -26,11 +26,7 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
     {
         DirectDisplay textBuffer{bootInformation};
         textBuffer.writeString("Direct display text buffer.");
-        textBuffer.writeString("\nmemory lower: ");
-        textBuffer.writeHex(bootInformation.memoryLower);
-        textBuffer.writeString(" memory upper: ");
-        textBuffer.writeHex(bootInformation.memoryUpper);
-        PhysicalMemoryManager physicalMemoryManager(bootInformation, textBuffer);
+        PhysicalMemoryManager physicalMemoryManager(bootInformation);
 
     }
 }

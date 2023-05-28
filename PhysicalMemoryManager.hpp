@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 #include "BootInformation.hpp"
-#include "TextBuffer.hpp"
 
 // Memory manager assumes that the kernel is located at the 1MiB mark in memory.
 class PhysicalMemoryManager
@@ -11,7 +10,7 @@ public:
     void* allocateAddress();
     void freeAddress(void* address);
 
-    PhysicalMemoryManager(const BootInformation& bootInformation, TextBuffer& textBuffer);
+    explicit PhysicalMemoryManager(const BootInformation& bootInformation);
 
 private:
     void* myStartAddress;

@@ -41,5 +41,4 @@ private:
 
     void readFramebuffer(void*& ebx, uint32_t dataSize);
     void readBasicMemoryInformation(void*& ebx);
-    void readMemoryMap(void*& , uint32_t dataSize);
 };
