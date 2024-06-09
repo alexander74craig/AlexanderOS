@@ -1,2 +1,2 @@
 # AlexanderOS
-A toy operating system project for learning how to build a rudimentary kernel.
+A simple operating system project for learning how to build a rudimentary kernel.
