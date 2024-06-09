@@ -25,9 +25,14 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
     else if (bootInformation.framebufferType == 1)
     {
         DirectDisplay textBuffer{bootInformation};
-        textBuffer.writeString("Direct display text buffer.");
+        textBuffer.writeString("Direct display text buffer.\n");
+        textBuffer.writeString("memory lower: ");
+        textBuffer.writeHex(bootInformation.memoryLower);
+        textBuffer.writeChar('\n');
+        textBuffer.writeString("memory upper: ");
+        textBuffer.writeHex(bootInformation.memoryUpper);
+        textBuffer.writeChar('\n');
         PhysicalMemoryManager physicalMemoryManager(bootInformation);
-
     }
 }
 }
