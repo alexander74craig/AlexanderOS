@@ -21,4 +21,4 @@ add_custom_command(TARGET AlexanderOS.iso
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/grub.cfg ${CMAKE_CURRENT_BINARY_DIR}/iso/boot/grub/grub.cfg
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/kernel/kernel ${CMAKE_CURRENT_BINARY_DIR}/iso/boot/kernel
         COMMAND grub-mkrescue -o AlexanderOS.iso iso
-        COMMAND qemu-system-x86_64 -boot d -cdrom AlexanderOS.iso)
+        COMMAND qemu-system-x86_64 -m 2G -boot d -cdrom AlexanderOS.iso)

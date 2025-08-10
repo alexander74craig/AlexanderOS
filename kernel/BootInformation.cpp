@@ -1,20 +1,21 @@
 #include "BootInformation.hpp"
 
-BootInformation::BootInformation(void* ebx)
+BootInformation::BootInformation(void* ebx) :
+    myEbx{ebx}
 {
     // Total size of boot information
-    uint32_t total_size(readUint32(ebx));
+    uint32_t total_size(readUint32());
     //Reserved 0s
-    readUint32(ebx);
+    readUint32();
 
     uint32_t currentSize{8};
     while(currentSize < total_size)
     {
         // Tag type
-        uint32_t type{readUint32(ebx)};
+        const uint32_t type{readUint32()};
 
         // Size in bytes.
-        uint32_t size{readUint32(ebx)};
+        const uint32_t size{readUint32()};
 
         uint32_t dataSize = size - 8;
         // Checks for padding to maintain tag alignment
@@ -24,16 +25,16 @@ BootInformation::BootInformation(void* ebx)
         }
         if (type == 8)
         {
-            readFramebuffer(ebx, dataSize);
+            readFramebuffer(dataSize);
         }
-        else if (type == 4)
+        else if (type == 6)
         {
-            readBasicMemoryInformation(ebx);
+            readMemoryMap(dataSize);
         }
         else 
         {
             // Skips over the current data section
-            ebx = (uint8_t*)ebx + dataSize;
+            myEbx = static_cast<uint8_t *>(myEbx) + dataSize;
         }
         // Adds size plus padding to current size of data read.
         currentSize += dataSize + 8;
@@ -42,53 +43,53 @@ BootInformation::BootInformation(void* ebx)
 
 
 
-uint64_t BootInformation::readUint64(void*& ebx)
+uint64_t BootInformation::readUint64()
 {
-    uint64_t returnInt{*(uint64_t*)ebx};
-    ebx = (uint64_t*)ebx + 1;
+    const uint64_t returnInt{*static_cast<uint64_t *>(myEbx)};
+    myEbx = static_cast<uint64_t *>(myEbx) + 1;
     return returnInt;
 }
-uint32_t BootInformation::readUint32(void*& ebx)
+uint32_t BootInformation::readUint32()
 {
-    uint32_t returnInt{*(uint32_t*)ebx};
-    ebx = (uint32_t*)ebx + 1;
+    const uint32_t returnInt{*static_cast<uint32_t *>(myEbx)};
+    myEbx = static_cast<uint32_t *>(myEbx) + 1;
     return returnInt;
 }
-uint16_t BootInformation::readUint16(void*& ebx)
+uint16_t BootInformation::readUint16()
 {
-    uint16_t returnInt{*(uint16_t*)ebx};
-    ebx = (uint16_t*)ebx + 1;
+    const uint16_t returnInt{*static_cast<uint16_t *>(myEbx)};
+    myEbx = static_cast<uint16_t *>(myEbx) + 1;
     return returnInt;
 }
-uint8_t BootInformation::readUint8(void*& ebx)
+uint8_t BootInformation::readUint8()
 {
-    uint8_t returnInt{*(uint8_t*)ebx};
-    ebx = (uint8_t*)ebx + 1;
+    const uint8_t returnInt{*static_cast<uint8_t *>(myEbx)};
+    myEbx = static_cast<uint8_t *>(myEbx) + 1;
     return returnInt;
 }
 
-void BootInformation::readFramebuffer(void*& ebx, uint32_t dataSize)
+void BootInformation::readFramebuffer(uint32_t dataSize)
 {
-    framebufferAddress = readUint64(ebx);
-    framebufferPitch = readUint32(ebx);
-    framebufferWidth = readUint32(ebx);
-    framebufferHeight = readUint32(ebx);
-    framebufferBitsPerPixel = readUint8(ebx);
-    framebufferType = readUint8(ebx);
+    framebufferAddress = readUint64();
+    framebufferPitch = readUint32();
+    framebufferWidth = readUint32();
+    framebufferHeight = readUint32();
+    framebufferBitsPerPixel = readUint8();
+    framebufferType = readUint8();
     // Reserved 2 bytes
-    readUint16(ebx);
+    readUint16();
     // Direct Display type
     if (framebufferType == 1)
     {
-        framebufferRedFieldPosition = readUint8(ebx);
-        framebufferRedMaskSize = readUint8(ebx);
-        framebufferGreenFieldPosition =readUint8(ebx);
-        framebufferGreenMaskSize = readUint8(ebx);
-        framebufferBlueFieldPosition = readUint8(ebx);
-        framebufferBlueMaskSize = readUint8(ebx);
+        framebufferRedFieldPosition = readUint8();
+        framebufferRedMaskSize = readUint8();
+        framebufferGreenFieldPosition =readUint8();
+        framebufferGreenMaskSize = readUint8();
+        framebufferBlueFieldPosition = readUint8();
+        framebufferBlueMaskSize = readUint8();
         // Alignment padding
-        readUint16(ebx);
-        readUint8(ebx);
+        readUint16();
+        readUint8();
     }
         // Not direct display type
     else
@@ -101,13 +102,22 @@ void BootInformation::readFramebuffer(void*& ebx, uint32_t dataSize)
         framebufferBlueMaskSize = 0;
         // Alignment padding
         dataSize -= 22;
-        ebx = (uint8_t*)ebx + dataSize;
+        myEbx = static_cast<uint8_t *>(myEbx) + dataSize;
     }
 }
 
-void BootInformation::readBasicMemoryInformation(void*& ebx)
+void BootInformation::readMemoryMap(const uint32_t dataSize)
 {
-    hasBasicsMemoryInformation = true;
-    memoryLower = readUint32(ebx);
-    memoryUpper = readUint32(ebx);
+    const uint8_t* root{static_cast<uint8_t*>(myEbx)};
+    hasMemoryMap = true;
+    readUint32(); // Entry size (must be 24)
+    readUint32(); // Entry version (must be 0)
+    while (myEbx < root + dataSize)
+    {
+        entries[numEntries].baseAddress = readUint64();
+        entries[numEntries].length = readUint64();
+        entries[numEntries].type = readUint32();
+        entries[numEntries].reserved = readUint32();
+        numEntries++;
+    }
 }

@@ -6,7 +6,7 @@
 #include "BootInformation.hpp"
 
 // 16 bit color depth display
-class DirectDisplay : public TextBuffer 
+class DirectDisplayTextBuffer : public TextBuffer
 {
 private:
     uint8_t* const myAddress;
@@ -28,13 +28,13 @@ private:
 
     void printChar(uint32_t xPos, uint32_t yPos, char character);
 
-    void scrollText();
+    void scrollText() const;
     
 public:
     // Default constructor, clears the screen.
-    explicit DirectDisplay(BootInformation bootInformation);
+    explicit DirectDisplayTextBuffer(const BootInformation& bootInformation);
 
-    ~DirectDisplay() override = default;
+    ~DirectDisplayTextBuffer() override = default;
 
     // Writes a character at the current position and handles scrolling.
     void writeChar(char character) override;

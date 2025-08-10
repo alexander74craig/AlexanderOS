@@ -2,9 +2,8 @@ extern "C"
 {
 #include <stdint.h>
 #include "BootInformation.hpp"
-#include "DirectDisplay.hpp"
+#include "DirectDisplayTextBuffer.hpp"
 #include "VGATextModeBuffer.hpp"
-#include "PhysicalMemoryManager.hpp"
 
 void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMagicNumber, void* grubBootInformationAddress) 
 {
@@ -24,15 +23,23 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
     }
     else if (bootInformation.framebufferType == 1)
     {
-        DirectDisplay textBuffer{bootInformation};
+        DirectDisplayTextBuffer textBuffer{bootInformation};
         textBuffer.writeString("Direct display text buffer.\n");
-        textBuffer.writeString("memory lower: ");
-        textBuffer.writeHex(bootInformation.memoryLower);
-        textBuffer.writeChar('\n');
-        textBuffer.writeString("memory upper: ");
-        textBuffer.writeHex(bootInformation.memoryUpper);
-        textBuffer.writeChar('\n');
-        PhysicalMemoryManager physicalMemoryManager(bootInformation);
+
+        textBuffer.writeString("\nnum entries : ");
+        textBuffer.writeHex(bootInformation.numEntries);
+
+        for (int i = 0; i < bootInformation.numEntries; i++)
+        {
+            textBuffer.writeString("\nbase address : ");
+            textBuffer.writeHex(bootInformation.entries[i].baseAddress);
+            textBuffer.writeString("  | length : ");
+            textBuffer.writeHex(bootInformation.entries[i].length);
+            textBuffer.writeString("  | type : ");
+            textBuffer.writeHex(bootInformation.entries[i].type);
+            textBuffer.writeString("  | reserved : ");
+            textBuffer.writeHex(bootInformation.entries[i].reserved);
+        }
     }
 }
 }

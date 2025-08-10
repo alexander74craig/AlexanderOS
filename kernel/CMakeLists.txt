@@ -3,15 +3,16 @@ add_executable(kernel
         BootInformation.cpp
         Color.cpp
         CPPSupport.cpp
-        DirectDisplay.cpp
+        DirectDisplayTextBuffer.cpp
         Font.S
         GDT.S
         IDT.cpp
         ISR.S
         kernel.cpp
-        PhysicalMemoryManager.cpp
         TextBuffer.cpp
-        VGATextModeBuffer.cpp)
+        VGATextModeBuffer.cpp
+        MemoryAllocator.cpp
+        MemoryMapEntry.h)
 target_include_directories(kernel PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(kernel
         PUBLIC

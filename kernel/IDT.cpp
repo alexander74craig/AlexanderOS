@@ -27,7 +27,6 @@ struct IDTR
 void handleInterrupt(uint32_t interruptIndex)
 {
     asm("hlt");
-    return;
 }
 
 #pragma pack(push, 16)
@@ -45,11 +44,11 @@ void setGateDescriptor(uint8_t index, void* isr, uint8_t flags)
 {
     GateDescriptor* descriptor = &idt[index];
 
-    descriptor->ISR_AddressLow = (uint32_t)isr & 0xFFFF;
+    descriptor->ISR_AddressLow = reinterpret_cast<uint32_t>(isr) & 0xFFFF;
     descriptor->segmentSelector = codeSegValue;
     descriptor->reserved = 0x00;
     descriptor->flags = flags;
-    descriptor->ISR_AddressHigh = (uint32_t)isr >> 16;
+    descriptor->ISR_AddressHigh = reinterpret_cast<uint32_t>(isr) >> 16;
 }
 
 extern void* interruptServiceRoutineTable[];
@@ -57,9 +56,9 @@ extern void* interruptServiceRoutineTable[];
 // Initializes the interrupt descriptor table with the addresses of the interrupt service routines
 void initializeInterruptDescriptorTable()
 {
-    const uint32_t numberOfGateDescriptors{32};
-    idtr.base = (uint32_t)&idt[0];
-    idtr.limit =(uint16_t)sizeof(GateDescriptor) * numberOfGateDescriptors - 1;
+    constexpr uint32_t numberOfGateDescriptors{32};
+    idtr.base = reinterpret_cast<uint32_t>(&idt[0]);
+    idtr.limit =static_cast<uint16_t>(sizeof(GateDescriptor)) * numberOfGateDescriptors - 1;
 
     for (uint32_t index {0}; index < numberOfGateDescriptors; index++)
     {

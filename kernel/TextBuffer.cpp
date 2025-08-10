@@ -24,26 +24,26 @@ void TextBuffer::writeHex(uint8_t byte)
     writeHexNibble(lower);
 }
 
-void TextBuffer::writeHex(uint16_t int16)
+void TextBuffer::writeHex(const uint16_t int16)
 {
-    uint8_t lower = 0xFF & int16;
-    uint8_t upper = int16 >> 8;
+    const uint8_t lower = 0xFF & int16;
+    const uint8_t upper = int16 >> 8;
     writeHex(upper);
     writeHex(lower);
 }
 
-void TextBuffer::writeHex(uint32_t int32)
+void TextBuffer::writeHex(const uint32_t int32)
 {
-    uint16_t lower = 0xFFFF & int32;
-    uint16_t upper = int32 >> 16;
+    const uint16_t lower = 0xFFFF & int32;
+    const uint16_t upper = int32 >> 16;
     writeHex(upper);
     writeHex(lower);
 }
 
 void TextBuffer::writeHex(uint64_t int64)
 {
-    uint32_t lower = 0xFFFFFFFF & int64;
-    uint32_t upper = int64 >> 32;
+    const uint32_t lower = 0xFFFFFFFF & int64;
+    const uint32_t upper = int64 >> 32;
     writeHex(upper);
     writeHex(lower);
 }

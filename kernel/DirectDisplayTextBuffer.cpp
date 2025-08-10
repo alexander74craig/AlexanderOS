@@ -1,7 +1,7 @@
-#include "DirectDisplay.hpp"
+#include "DirectDisplayTextBuffer.hpp"
 
-DirectDisplay::DirectDisplay(BootInformation bootInformation) : 
-    myAddress{(uint8_t*)bootInformation.framebufferAddress},
+DirectDisplayTextBuffer::DirectDisplayTextBuffer(const BootInformation& bootInformation) :
+    myAddress{reinterpret_cast<uint8_t *>(bootInformation.framebufferAddress)},
     myWidth{bootInformation.framebufferWidth},
     myHeight{bootInformation.framebufferHeight},
     myPitch{bootInformation.framebufferPitch},
@@ -15,10 +15,10 @@ DirectDisplay::DirectDisplay(BootInformation bootInformation) :
     myColumn{0},
     myRow{0}
 {
-    //TODO: Check bits per pixel, mask size, and
+    //TODO: Check bits per pixel, mask size
 }
 
-void DirectDisplay::printChar(uint32_t xPos, uint32_t yPos, char character)
+void DirectDisplayTextBuffer::printChar(const uint32_t xPos, const uint32_t yPos, const char character)
 {
     if (xPos >= myWidth/8 || yPos >= myHeight/16)
     {
@@ -27,7 +27,7 @@ void DirectDisplay::printChar(uint32_t xPos, uint32_t yPos, char character)
 
     Color color{0xff, 0xff, 0xff};
 
-    uint32_t* currentAddress = (uint32_t*)(myAddress + (xPos * 8 * 4 + yPos * 16 * myPitch));
+    uint32_t* currentAddress = reinterpret_cast<uint32_t *>(myAddress + (xPos * 8 * 4 + yPos * 16 * myPitch));
 
     // Font.S
     extern uint8_t fontGlyphs[];
@@ -57,7 +57,7 @@ void DirectDisplay::printChar(uint32_t xPos, uint32_t yPos, char character)
 }
 
 
-void DirectDisplay::clearScreen()
+void DirectDisplayTextBuffer::clearScreen()
 {
     uint8_t* currentAddress = myAddress;
     while (currentAddress != myMaxAddress)
@@ -69,8 +69,7 @@ void DirectDisplay::clearScreen()
     myRow = 0;
 }
 
-void DirectDisplay::scrollText()
-{
+void DirectDisplayTextBuffer::scrollText() const {
     uint8_t* currentAddress = myAddress;
     while (currentAddress != (myMaxAddress - myPitch * 16))
     {
@@ -84,7 +83,7 @@ void DirectDisplay::scrollText()
     }
 }
 
-void DirectDisplay::writeChar(char character)
+void DirectDisplayTextBuffer::writeChar(const char character)
 {
     if (character == '\n')
     {            
