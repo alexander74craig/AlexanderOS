@@ -1,3 +1,5 @@
+#include "MemoryAllocator.h"
+
 extern "C"
 {
 #include <stdint.h>
@@ -29,16 +31,31 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
         textBuffer.writeString("\nnum entries : ");
         textBuffer.writeHex(bootInformation.numEntries);
 
-        for (int i = 0; i < bootInformation.numEntries; i++)
+        for (uint32_t i = 0; i < bootInformation.numEntries; i++)
         {
-            textBuffer.writeString("\nbase address : ");
-            textBuffer.writeHex(bootInformation.entries[i].baseAddress);
+            if (bootInformation.entries[i].type == 1)
+            {
+                textBuffer.writeString("\nbase address : ");
+                textBuffer.writeHex(bootInformation.entries[i].baseAddress);
+                textBuffer.writeString("  | length : ");
+                textBuffer.writeHex(bootInformation.entries[i].length);
+                textBuffer.writeString("  | type : ");
+                textBuffer.writeHex(bootInformation.entries[i].type);
+            }
+        }
+        const MemoryAllocator allocator(bootInformation, textBuffer);
+        MemoryAllocatorNode* node = allocator.myRootAddress;
+        if (node == nullptr)
+        {
+            textBuffer.writeString("\nMemory allocator empty.");
+        }
+        while (node != nullptr)
+        {
+            textBuffer.writeString("\n Address : ");
+            textBuffer.writeHex(reinterpret_cast<uint64_t>(node));
             textBuffer.writeString("  | length : ");
-            textBuffer.writeHex(bootInformation.entries[i].length);
-            textBuffer.writeString("  | type : ");
-            textBuffer.writeHex(bootInformation.entries[i].type);
-            textBuffer.writeString("  | reserved : ");
-            textBuffer.writeHex(bootInformation.entries[i].reserved);
+            textBuffer.writeHex(node->size);
+            node = node->nextAddress;
         }
     }
 }

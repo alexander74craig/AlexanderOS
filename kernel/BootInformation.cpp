@@ -117,7 +117,7 @@ void BootInformation::readMemoryMap(const uint32_t dataSize)
         entries[numEntries].baseAddress = readUint64();
         entries[numEntries].length = readUint64();
         entries[numEntries].type = readUint32();
-        entries[numEntries].reserved = readUint32();
+        readUint32(); // Reserved, must be 0 and ignored
         numEntries++;
     }
 }
