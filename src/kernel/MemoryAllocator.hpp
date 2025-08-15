@@ -1,10 +1,8 @@
 #pragma once
-#include <stdint.h>
-
+#include "StandardDefinitions.hpp"
 #include "BootInformation.hpp"
-#include <stddef.h>
 #include "DirectDisplayTextBuffer.hpp"
-#include "MemoryAllocatorNode.h"
+#include "MemoryAllocatorNode.hpp"
 
 class MemoryAllocator {
 public:

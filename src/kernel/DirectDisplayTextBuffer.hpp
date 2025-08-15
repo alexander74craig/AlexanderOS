@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include "StandardDefinitions.hpp"
 #include "TextBuffer.hpp"
 #include "Color.hpp"
 #include "BootInformation.hpp"

@@ -1,11 +1,12 @@
-#include "MemoryAllocator.h"
+#include "StandardDefinitions.hpp"
 
 extern "C"
 {
-#include <stdint.h>
+
 #include "BootInformation.hpp"
 #include "DirectDisplayTextBuffer.hpp"
 #include "VGATextModeBuffer.hpp"
+#include "MemoryAllocator.hpp"
 
 void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMagicNumber, void* grubBootInformationAddress) 
 {
@@ -54,7 +55,7 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
             textBuffer.writeString("\n Address : ");
             textBuffer.writeHex(reinterpret_cast<uint64_t>(node));
             textBuffer.writeString("  | length : ");
-            textBuffer.writeHex(node->size);
+            textBuffer.writeHex(node->length);
             node = node->nextAddress;
         }
     }

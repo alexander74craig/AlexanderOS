@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include "StandardDefinitions.hpp"
 
 struct MemoryMapEntry {
     uint64_t baseAddress;

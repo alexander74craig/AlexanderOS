@@ -1,5 +1,5 @@
 #pragma once
-#include <stdint.h>
+#include "StandardDefinitions.hpp"
 #include "TextBuffer.hpp"
 
 class VGATextModeBuffer : public TextBuffer

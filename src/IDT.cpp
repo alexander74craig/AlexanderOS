@@ -1,7 +1,7 @@
+#include "StandardDefinitions.hpp"
+
 extern "C"
 {
-#include <stdint.h>
-
 #pragma pack(push, 1)
 // IDT entry
 struct GateDescriptor

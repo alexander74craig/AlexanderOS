@@ -1,8 +1,8 @@
 #pragma once
 
-#include <stdint.h>
+#include "StandardDefinitions.hpp"
 
-#include "MemoryMapEntry.h"
+#include "MemoryMapEntry.hpp"
 
 
 class BootInformation
