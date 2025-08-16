@@ -11,11 +11,3 @@ macro(publicizeHeaders target targetType targetHeaders)
             PUBLIC_HEADER "${${targetHeaders}}")
 endmacro()
 
-add_library(kernelFlags INTERFACE)
-target_compile_options(kernelFlags INTERFACE
-        $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra -fno-rtti -ffreestanding -fno-exceptions>
-        $<$<COMPILE_LANGUAGE:C>:-Wall -Wextra -ffreestanding>)
-target_link_options(kernelFlags INTERFACE
-        -nostdlib
-        -lgcc
-        -nodefaultlibs)

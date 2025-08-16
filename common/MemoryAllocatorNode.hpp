@@ -1,5 +1,5 @@
 #pragma once
-#include "StandardDefinitions.hpp"
+#include "stddef.h"
 
 #pragma pack(push, 1)
 struct MemoryAllocatorNode {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "StandardDefinitions.hpp"
+#include "stddef.h"
 
 #include "MemoryMapEntry.hpp"
 

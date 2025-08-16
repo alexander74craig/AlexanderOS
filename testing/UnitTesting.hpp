@@ -1,5 +1,5 @@
 #pragma once
-#include "StandardDefinitions.hpp"
+#include "stddef.h"
 
 using TestFunction = int(*)();
 

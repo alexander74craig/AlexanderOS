@@ -1,4 +1,4 @@
-#include "StandardDefinitions.hpp"
+#include "stdint.h"
 
 extern "C"
 {

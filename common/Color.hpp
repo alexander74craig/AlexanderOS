@@ -1,6 +1,6 @@
 #pragma once
 
-#include "StandardDefinitions.hpp"
+#include "stdint.h"
 
 class Color
 {

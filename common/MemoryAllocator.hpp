@@ -1,5 +1,5 @@
 #pragma once
-#include "StandardDefinitions.hpp"
+#include "stddef.h"
 #include "BootInformation.hpp"
 #include "DirectDisplayTextBuffer.hpp"
 #include "MemoryAllocatorNode.hpp"

@@ -15,14 +15,18 @@ add_subdirectory(cmake)
 
 add_subdirectory(testing)
 
-add_subdirectory(src)
+add_subdirectory(kernelDefs)
+
+add_subdirectory(common)
+
+add_subdirectory(kernel)
 
 add_custom_target(AlexanderOS.iso)
-add_dependencies(AlexanderOS.iso main)
+add_dependencies(AlexanderOS.iso kernel)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/grub.cfg ${CMAKE_CURRENT_BINARY_DIR}/iso/boot/grub/grub.cfg)
 add_custom_command(TARGET AlexanderOS.iso
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/iso/boot/grub
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/grub.cfg ${CMAKE_CURRENT_BINARY_DIR}/iso/boot/grub/grub.cfg
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/src/main ${CMAKE_CURRENT_BINARY_DIR}/iso/boot/main
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/kernel ${CMAKE_CURRENT_BINARY_DIR}/iso/boot/kernel
         COMMAND grub-mkrescue -o AlexanderOS.iso iso)
