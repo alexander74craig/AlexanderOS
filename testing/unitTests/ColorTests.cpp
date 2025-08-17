@@ -1,13 +1,10 @@
 #include "Color.hpp"
-#include "UnitTesting.hpp"
+#include "gtest/gtest.h"
 
-TEST(Colortest)
+TEST(Color, constructor)
 {
     Color testColor{2,2,1};
     ASSERT_EQ(testColor.red, 2);
     ASSERT_EQ(testColor.green, 2);
     ASSERT_EQ(testColor.blue, 1);
-    return 0;
 }
-
-TEST_LIST(Colortest)

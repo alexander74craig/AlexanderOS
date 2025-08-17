@@ -8,7 +8,6 @@ add_library(common STATIC
         TextBuffer.cpp
         VGATextModeBuffer.cpp
         Font.S)
-target_link_libraries(common PUBLIC kernelDefs)
 set(commonHeaders
         BootInformation.hpp
         Color.hpp

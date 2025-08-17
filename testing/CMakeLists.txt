@@ -1,20 +1,23 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.28.3 FATAL_ERROR)
 
-include(CTest)
-enable_testing()
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+# Prevent GoogleTest from overriding your compiler/linker options
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+include(GoogleTest)
 
-add_library(unitTesting INTERFACE)
-set(unitTestingHeaders
-        UnitTesting.hpp)
-publicizeHeaders(unitTesting INTERFACE unitTestingHeaders)
-
-macro(addUnitTests testName sourceFile libraryName)
+macro(addTests testName sourceFile libraryName)
     add_executable(${testName}
             ${sourceFile})
     target_link_libraries(${testName}
             ${libraryName}
-            unitTesting)
-    add_test(NAME ${testName} COMMAND ${testName})
+            GTest::gtest
+            GTest::gtest_main)
+    gtest_discover_tests(${testName})
 endmacro()
 
 add_subdirectory(unitTests)
