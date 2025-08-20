@@ -3,7 +3,6 @@
 #include "BootInformation.hpp"
 #include "DirectDisplayTextBuffer.hpp"
 #include "MemoryAllocatorNode.hpp"
-#include "Memory.hpp"
 
 class MemoryAllocator {
 public:

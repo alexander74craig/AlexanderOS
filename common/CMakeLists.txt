@@ -8,7 +8,6 @@ add_library(common STATIC
         TextBuffer.cpp
         VGATextModeBuffer.cpp
         Font.S
-        Memory.cpp
         CPPSupport.cpp)
 set(commonHeaders
         BootInformation.hpp
@@ -17,6 +16,5 @@ set(commonHeaders
         MemoryAllocator.hpp
         MemoryAllocatorNode.hpp
         TextBuffer.hpp
-        VGATextModeBuffer.hpp
-        Memory.hpp)
+        VGATextModeBuffer.hpp)
 publicizeHeaders(common PUBLIC commonHeaders)

@@ -12,3 +12,5 @@ target_link_options(kernelDefs INTERFACE
         -nostdlib
         -lgcc
         -nodefaultlibs)
+target_compile_definitions(kernelDefs INTERFACE
+        $<$<COMPILE_LANGUAGE:CXX>:BUILD_KERNEL>)
