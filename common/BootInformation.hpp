@@ -1,8 +1,7 @@
 #pragma once
 
 #include "stddef.h"
-
-#include "MemoryMapEntry.hpp"
+#include "Memory.hpp"
 
 
 class BootInformation
@@ -30,10 +29,7 @@ public:
     uint8_t framebufferBlueFieldPosition{};
     uint8_t framebufferBlueMaskSize{};
 
-    // Memory Map = 6
-    bool hasMemoryMap{false};
-    uint32_t numEntries{0};
-    MemoryMapEntry entries[64];
+    MemoryList getMemoryList() const;
 
 private:
     uint64_t readUint64();
@@ -43,6 +39,10 @@ private:
 
     void readFramebuffer(uint32_t dataSize);
     void readMemoryMap(uint32_t dataSize);
+
+    // Memory Map = 6
+    bool hasMemoryMap{false};
+    MemoryList myMemoryList;
 
     void* myEbx{};
 };

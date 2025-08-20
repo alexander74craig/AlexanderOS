@@ -7,14 +7,15 @@ add_library(common STATIC
         MemoryAllocator.cpp
         TextBuffer.cpp
         VGATextModeBuffer.cpp
-        Font.S)
+        Font.S
+        Memory.cpp)
 set(commonHeaders
         BootInformation.hpp
         Color.hpp
         DirectDisplayTextBuffer.hpp
         MemoryAllocator.hpp
         MemoryAllocatorNode.hpp
-        MemoryMapEntry.hpp
         TextBuffer.hpp
-        VGATextModeBuffer.hpp)
+        VGATextModeBuffer.hpp
+        Memory.hpp)
 publicizeHeaders(common PUBLIC commonHeaders)

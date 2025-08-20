@@ -112,12 +112,48 @@ void BootInformation::readMemoryMap(const uint32_t dataSize)
     hasMemoryMap = true;
     readUint32(); // Entry size (must be 24)
     readUint32(); // Entry version (must be 0)
+
+    extern void* kernelStart;
+    const uint64_t kernelStartAddress {reinterpret_cast<uint64_t>(&kernelStart)};
+
+    extern void* kernelEnd;
+    const uint64_t kernelEndAddress {reinterpret_cast<uint64_t>(&kernelEnd)};
+
     while (myEbx < root + dataSize)
     {
-        entries[numEntries].baseAddress = readUint64();
-        entries[numEntries].length = readUint64();
-        entries[numEntries].type = readUint32();
+        uint64_t address {readUint64()};
+        uint64_t size {readUint64()};
+        uint32_t type {readUint32()};
         readUint32(); // Reserved, must be 0 and ignored
-        numEntries++;
+
+        // Ensures the entry is free ram
+        if (type == 1 )
+        {
+            // Ensures that we don't overwrite the memory where the kernel is loaded.
+            if (!(address + size > kernelStartAddress
+                && kernelEndAddress > address))
+            {
+                myMemoryList.pushBack({address, size});
+            }
+            // If a section of memory overlaps the kernel
+            else
+            {
+                // Memory before the kernel
+                if (address < kernelStartAddress)
+                {
+                    myMemoryList.pushBack({address, kernelStartAddress - address});
+                }
+                // Memory after the kernel
+                if (address + size > (kernelEndAddress + 1))
+                {
+                    myMemoryList.pushBack({kernelEndAddress + 1, size + address - (kernelEndAddress + 1)});
+                }
+            }
+        }
     }
+}
+
+MemoryList BootInformation::getMemoryList() const
+{
+    return myMemoryList;
 }

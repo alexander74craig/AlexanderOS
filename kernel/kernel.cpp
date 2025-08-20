@@ -29,22 +29,17 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
         DirectDisplayTextBuffer textBuffer{bootInformation};
         textBuffer.writeString("Direct display text buffer.\n");
 
-        textBuffer.writeString("\nnum entries : ");
-        textBuffer.writeHex(bootInformation.numEntries);
+        extern void* kernelStart;
+        const uint64_t kernelStartAddress {reinterpret_cast<uint64_t>(&kernelStart)};
+        textBuffer.writeString("\nKernel start : ");
+        textBuffer.writeHex(kernelStartAddress);
 
-        for (uint32_t i = 0; i < bootInformation.numEntries; i++)
-        {
-            if (bootInformation.entries[i].type == 1)
-            {
-                textBuffer.writeString("\nbase address : ");
-                textBuffer.writeHex(bootInformation.entries[i].baseAddress);
-                textBuffer.writeString("  | length : ");
-                textBuffer.writeHex(bootInformation.entries[i].length);
-                textBuffer.writeString("  | type : ");
-                textBuffer.writeHex(bootInformation.entries[i].type);
-            }
-        }
-        const MemoryAllocator allocator(bootInformation, textBuffer);
+        extern void* kernelEnd;
+        const uint64_t kernelEndAddress {reinterpret_cast<uint64_t>(&kernelEnd)};
+        textBuffer.writeString("\nKernel end : ");
+        textBuffer.writeHex(kernelEndAddress);
+
+        const MemoryAllocator allocator(bootInformation.getMemoryList());
         MemoryAllocatorNode* node = allocator.myRootAddress;
         if (node == nullptr)
         {
@@ -52,10 +47,10 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
         }
         while (node != nullptr)
         {
-            textBuffer.writeString("\n Address : ");
+            textBuffer.writeString("\nAddress : ");
             textBuffer.writeHex(reinterpret_cast<uint64_t>(node));
             textBuffer.writeString("  | length : ");
-            textBuffer.writeHex(node->length);
+            textBuffer.writeHex(node->size);
             node = node->nextAddress;
         }
     }

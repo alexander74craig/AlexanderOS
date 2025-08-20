@@ -1,46 +1,49 @@
 #include "MemoryAllocator.hpp"
 
-MemoryAllocator::MemoryAllocator(const BootInformation& bootInformation, DirectDisplayTextBuffer& textBuffer) :
+MemoryAllocator::MemoryAllocator(const MemoryList& memoryList) :
         myRootAddress{nullptr}
 {
-    extern void* kernelStart;
-    const uint64_t kernelStartAddress = reinterpret_cast<uint64_t>(&kernelStart);
-    textBuffer.writeString("\n Kernel start: ");
-    textBuffer.writeHex(kernelStartAddress);
-
-    extern void* kernelEnd;
-    const uint64_t kernelEndAddress = reinterpret_cast<uint64_t>(&kernelEnd);
-    textBuffer.writeString("\n Kernel end : ");
-    textBuffer.writeHex(kernelEndAddress);
-
-    auto linkMemory = [this, bootInformation](const uint64_t& address, const uint64_t& length)
+    for (size_t i = 0; i < memoryList.size(); i++)
     {
-        MemoryAllocatorNode*& trace = myRootAddress;
-        // Finds the first node without a subsequent node
-        while (trace != nullptr)
-        {
-            trace = trace->nextAddress;
-        }
-        trace = reinterpret_cast<MemoryAllocatorNode*>(address);
-        trace->length = length;
-        trace->nextAddress = nullptr;
-    };
-
-    for (uint32_t i = 0; i < bootInformation.numEntries; i++)
-    {
-        uint64_t address = bootInformation.entries[i].baseAddress;
-        uint64_t length = bootInformation.entries[i].length;
-        // Ensures the entry is free ram and has space to store the memory node information,
-        //      ignores memory rooted at nullptr
-        if (bootInformation.entries[i].type == 1 && length > sizeof(MemoryAllocatorNode) && address != 0)
-        {
-            if (address <= kernelEndAddress && address + length >= kernelEndAddress)
-            {
-                length = length - (kernelEndAddress - address - 1);
-                address = kernelEndAddress + 1;
-            }
-            linkMemory(address, length);
-        }
+        linkMemory(memoryList.at(i).address, memoryList.at(i).size);
     }
 }
 
+//Should be used by both initialization and freeing.
+void MemoryAllocator::linkMemory(uint64_t address, uint64_t size)
+{
+    if (size <= sizeof(MemoryAllocatorNode))
+    {
+        return;
+    }
+    if (address == 0)
+    {
+        if (size > 2 + sizeof(MemoryAllocatorNode))
+        {
+            address += 2;
+            size -= 2;
+        }
+        else
+        {
+            return;
+        }
+    }
+    if (myRootAddress == nullptr)
+    {
+        myRootAddress = reinterpret_cast<MemoryAllocatorNode*>(address);
+        myRootAddress->size = size - sizeof(MemoryAllocatorNode);
+        myRootAddress->nextAddress = nullptr;
+    }
+    else
+    {
+        MemoryAllocatorNode* trace = myRootAddress;
+        // Finds the first node without a subsequent node
+        while (trace->nextAddress != nullptr)
+        {
+            trace = trace->nextAddress;
+        }
+        trace->nextAddress = reinterpret_cast<MemoryAllocatorNode*>(address);
+        trace->nextAddress->size = size - sizeof(MemoryAllocatorNode);
+        trace->nextAddress->nextAddress = nullptr;
+    }
+}
