@@ -1,18 +1,8 @@
 #include "MemoryAllocator.hpp"
 
-MemoryAllocator::MemoryAllocator(const MemoryList& memoryList) :
-        myRootAddress{nullptr}
-{
-    for (size_t i = 0; i < memoryList.size(); i++)
-    {
-        linkMemory(memoryList.at(i).address, memoryList.at(i).size);
-    }
-}
-
-//Should be used by both initialization and freeing.
 void MemoryAllocator::linkMemory(uint64_t address, uint64_t size)
 {
-    if (size <= sizeof(MemoryAllocatorNode))
+    if (size < sizeof(MemoryAllocatorNode))
     {
         return;
     }
@@ -37,13 +27,52 @@ void MemoryAllocator::linkMemory(uint64_t address, uint64_t size)
     else
     {
         MemoryAllocatorNode* trace = myRootAddress;
-        // Finds the first node without a subsequent node
+        // TODO: Find correct position for block that keep memory addresses in order
         while (trace->nextAddress != nullptr)
         {
             trace = trace->nextAddress;
         }
-        trace->nextAddress = reinterpret_cast<MemoryAllocatorNode*>(address);
-        trace->nextAddress->size = size - sizeof(MemoryAllocatorNode);
-        trace->nextAddress->nextAddress = nullptr;
+        //TODO: Check if contiguous with link and combine if so
+        if (trace->nextAddress == nullptr)
+        {
+            trace->nextAddress = reinterpret_cast<MemoryAllocatorNode*>(address);
+            trace->nextAddress->size = size - sizeof(MemoryAllocatorNode);
+            trace->nextAddress->nextAddress = nullptr;
+        }
+        else
+        {
+            const auto previousNext = trace->nextAddress;
+            trace->nextAddress = reinterpret_cast<MemoryAllocatorNode*>(address);
+            trace->nextAddress->size = size - sizeof(MemoryAllocatorNode);
+            trace->nextAddress->nextAddress = previousNext;
+        }
     }
+}
+
+void* MemoryAllocator::alloc(size_t size)
+{
+    if (size < sizeof(MemoryAllocatorNode))
+    {
+        size = sizeof(MemoryAllocatorNode);
+    }
+    MemoryAllocatorNode* trace = myRootAddress;
+    while (trace != nullptr)
+    {
+        if (trace->size >= size)
+        {
+            trace->size -= size;
+            return (reinterpret_cast<uint8_t*>(trace) + trace->size);
+        }
+        trace = trace->nextAddress;
+    }
+    return nullptr;
+}
+
+void MemoryAllocator::free(void* ptr, size_t size)
+{
+    if (size < sizeof(MemoryAllocatorNode))
+    {
+        size = sizeof(MemoryAllocatorNode);
+    }
+    linkMemory(reinterpret_cast<uint64_t>(ptr), size);
 }

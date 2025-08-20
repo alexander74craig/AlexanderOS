@@ -1,5 +1,7 @@
 #include "BootInformation.hpp"
 
+#include <MemoryAllocator.hpp>
+
 BootInformation::BootInformation(void* ebx) :
     myEbx{ebx}
 {
@@ -109,7 +111,6 @@ void BootInformation::readFramebuffer(uint32_t dataSize)
 void BootInformation::readMemoryMap(const uint32_t dataSize)
 {
     const uint8_t* root{static_cast<uint8_t*>(myEbx)};
-    hasMemoryMap = true;
     readUint32(); // Entry size (must be 24)
     readUint32(); // Entry version (must be 0)
 
@@ -133,7 +134,7 @@ void BootInformation::readMemoryMap(const uint32_t dataSize)
             if (!(address + size > kernelStartAddress
                 && kernelEndAddress > address))
             {
-                myMemoryList.pushBack({address, size});
+                MemoryAllocator::instance().linkMemory(address, size);
             }
             // If a section of memory overlaps the kernel
             else
@@ -141,19 +142,14 @@ void BootInformation::readMemoryMap(const uint32_t dataSize)
                 // Memory before the kernel
                 if (address < kernelStartAddress)
                 {
-                    myMemoryList.pushBack({address, kernelStartAddress - address});
+                    MemoryAllocator::instance().linkMemory(address, kernelStartAddress - address);
                 }
                 // Memory after the kernel
                 if (address + size > (kernelEndAddress + 1))
                 {
-                    myMemoryList.pushBack({kernelEndAddress + 1, size + address - (kernelEndAddress + 1)});
+                    MemoryAllocator::instance().linkMemory(kernelEndAddress + 1, size + address - (kernelEndAddress + 1));
                 }
             }
         }
     }
-}
-
-MemoryList BootInformation::getMemoryList() const
-{
-    return myMemoryList;
 }

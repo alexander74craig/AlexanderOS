@@ -29,8 +29,6 @@ public:
     uint8_t framebufferBlueFieldPosition{};
     uint8_t framebufferBlueMaskSize{};
 
-    MemoryList getMemoryList() const;
-
 private:
     uint64_t readUint64();
     uint32_t readUint32();
@@ -39,10 +37,6 @@ private:
 
     void readFramebuffer(uint32_t dataSize);
     void readMemoryMap(uint32_t dataSize);
-
-    // Memory Map = 6
-    bool hasMemoryMap{false};
-    MemoryList myMemoryList;
 
     void* myEbx{};
 };

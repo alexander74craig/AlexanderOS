@@ -39,8 +39,7 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
         textBuffer.writeString("\nKernel end : ");
         textBuffer.writeHex(kernelEndAddress);
 
-        const MemoryAllocator allocator(bootInformation.getMemoryList());
-        MemoryAllocatorNode* node = allocator.myRootAddress;
+        MemoryAllocatorNode* node = MemoryAllocator::instance().myRootAddress;
         if (node == nullptr)
         {
             textBuffer.writeString("\nMemory allocator empty.");
