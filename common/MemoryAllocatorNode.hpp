@@ -1,12 +1,12 @@
 #pragma once
 #include "stddef.h"
 
-#pragma pack(push, 1)
-struct MemoryAllocatorNode {
+struct alignas(16) MemoryAllocatorNode {
     //ADDRESS IS WHERE IT IS;
     //! \brief Size in bytes.
-    uint64_t size;
-    //! \brief Address of next node.
+    size_t size;
+    //! \brief Address of the next node.
     MemoryAllocatorNode* nextAddress;
 };
-#pragma pack(pop)
+
+static_assert((alignof(MemoryAllocatorNode) % 16) == 0, "MemoryAllocatorNode not aligned");

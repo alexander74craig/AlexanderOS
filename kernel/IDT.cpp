@@ -3,7 +3,7 @@
 extern "C"
 {
 #pragma pack(push, 1)
-// IDT entry
+//! \brief IDT entry
 struct GateDescriptor
 {
     uint16_t    ISR_AddressLow; // The lower 16 bits of the ISR's address
@@ -15,7 +15,7 @@ struct GateDescriptor
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-// Struct representing the value of the interrupt descriptor table register.
+//! \brief Struct representing the value of the interrupt descriptor table register.
 struct IDTR
 {	
     uint16_t limit; // Limit of address
@@ -23,7 +23,8 @@ struct IDTR
 };
 #pragma pack(pop)
 
-// Function called when interrupts occur
+//! \brief Function called when interrupts occur
+//! \param[in] interruptIndex Index of the calling interrupt within the interrupt table.
 void handleInterrupt(uint32_t interruptIndex)
 {
     asm("hlt");
@@ -53,7 +54,7 @@ void setGateDescriptor(uint8_t index, void* isr, uint8_t flags)
 
 extern void* interruptServiceRoutineTable[];
 
-// Initializes the interrupt descriptor table with the addresses of the interrupt service routines
+//! \brief Initializes the interrupt descriptor table with the addresses of the interrupt service routines
 void initializeInterruptDescriptorTable()
 {
     constexpr uint32_t numberOfGateDescriptors{32};

@@ -72,36 +72,30 @@ uint8_t BootInformation::readUint8()
 
 void BootInformation::readFramebuffer(uint32_t dataSize)
 {
-    framebufferAddress = readUint64();
-    framebufferPitch = readUint32();
-    framebufferWidth = readUint32();
-    framebufferHeight = readUint32();
-    framebufferBitsPerPixel = readUint8();
-    framebufferType = readUint8();
+    myFrameBuffer.address = reinterpret_cast<uint8_t*>(readUint64());
+    myFrameBuffer.pitch = readUint32();
+    myFrameBuffer.width = readUint32();
+    myFrameBuffer.height = readUint32();
+    myFrameBuffer.bitsPerPixel = readUint8();
+    myFrameBuffer.type = readUint8();
     // Reserved 2 bytes
     readUint16();
     // Direct Display type
-    if (framebufferType == 1)
+    if (myFrameBuffer.type == 1)
     {
-        framebufferRedFieldPosition = readUint8();
-        framebufferRedMaskSize = readUint8();
-        framebufferGreenFieldPosition =readUint8();
-        framebufferGreenMaskSize = readUint8();
-        framebufferBlueFieldPosition = readUint8();
-        framebufferBlueMaskSize = readUint8();
+        myFrameBuffer.redFieldPosition = readUint8();
+        myFrameBuffer.redMaskSize = readUint8();
+        myFrameBuffer.greenFieldPosition =readUint8();
+        myFrameBuffer.greenMaskSize = readUint8();
+        myFrameBuffer.blueFieldPosition = readUint8();
+        myFrameBuffer.blueMaskSize = readUint8();
         // Alignment padding
         readUint16();
         readUint8();
     }
-        // Not direct display type
+    // Not direct display type
     else
     {
-        framebufferRedFieldPosition = 0;
-        framebufferRedMaskSize = 0;
-        framebufferGreenFieldPosition = 0;
-        framebufferGreenMaskSize = 0;
-        framebufferBlueFieldPosition = 0;
-        framebufferBlueMaskSize = 0;
         // Alignment padding
         dataSize -= 22;
         myEbx = static_cast<uint8_t *>(myEbx) + dataSize;
@@ -126,7 +120,7 @@ void BootInformation::readMemoryMap(const uint32_t dataSize)
         uint64_t size {readUint64()};
         uint32_t type {readUint32()};
         readUint32(); // Reserved, must be 0 and ignored
-
+        //TODO: Ensure that you don't overwrite the multiboot 2 header yet.
         // Ensures the entry is free ram
         if (type == 1 )
         {

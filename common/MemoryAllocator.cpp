@@ -51,6 +51,7 @@ void MemoryAllocator::linkMemory(uint64_t address, uint64_t size)
 
 void* MemoryAllocator::alloc(size_t size)
 {
+    //TODO: Multiples of 16 to align
     if (size < sizeof(MemoryAllocatorNode))
     {
         size = sizeof(MemoryAllocatorNode);
@@ -70,6 +71,7 @@ void* MemoryAllocator::alloc(size_t size)
 
 void MemoryAllocator::free(void* ptr, size_t size)
 {
+    //TODO: Multiples of 16 to align
     if (size < sizeof(MemoryAllocatorNode))
     {
         size = sizeof(MemoryAllocatorNode);

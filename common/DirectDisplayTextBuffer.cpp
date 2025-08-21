@@ -1,17 +1,8 @@
 #include "DirectDisplayTextBuffer.hpp"
 
-DirectDisplayTextBuffer::DirectDisplayTextBuffer(const BootInformation& bootInformation) :
-    myAddress{reinterpret_cast<uint8_t *>(bootInformation.framebufferAddress)},
-    myWidth{bootInformation.framebufferWidth},
-    myHeight{bootInformation.framebufferHeight},
-    myPitch{bootInformation.framebufferPitch},
-    myMaxAddress{myAddress + (myPitch * myHeight)},
-    myRedFieldPosition{bootInformation.framebufferRedFieldPosition},
-    myRedMaskSize{bootInformation.framebufferRedMaskSize},
-    myGreenFieldPosition{bootInformation.framebufferGreenFieldPosition},
-    myGreenMaskSize{bootInformation.framebufferGreenMaskSize},
-    myBlueFieldPosition{bootInformation.framebufferBlueFieldPosition},
-    myBlueMaskSize{bootInformation.framebufferBlueMaskSize},
+DirectDisplayTextBuffer::DirectDisplayTextBuffer(const FrameBuffer& frameBuffer) :
+    myFrameBuffer{frameBuffer},
+    myMaxAddress{frameBuffer.address + (frameBuffer.pitch * frameBuffer.height)},
     myColumn{0},
     myRow{0}
 {
@@ -20,14 +11,14 @@ DirectDisplayTextBuffer::DirectDisplayTextBuffer(const BootInformation& bootInfo
 
 void DirectDisplayTextBuffer::printChar(const uint32_t xPos, const uint32_t yPos, const char character)
 {
-    if (xPos >= myWidth/8 || yPos >= myHeight/16)
+    if (xPos >= myFrameBuffer.width/8 || yPos >= myFrameBuffer.height/16)
     {
         return;
     }
 
     Color color{0xff, 0xff, 0xff};
 
-    uint32_t* currentAddress = reinterpret_cast<uint32_t *>(myAddress + (xPos * 8 * 4 + yPos * 16 * myPitch));
+    uint32_t* currentAddress = reinterpret_cast<uint32_t *>(myFrameBuffer.address + (xPos * 8 * 4 + yPos * 16 * myFrameBuffer.pitch));
 
     // Font.S
     extern uint8_t fontGlyphs[];
@@ -37,9 +28,9 @@ void DirectDisplayTextBuffer::printChar(const uint32_t xPos, const uint32_t yPos
     {
         if ((*characterRow >> (7 - iGlyphPixel % 8)) & 1)
         {
-            uint32_t printColor = color.red << myRedFieldPosition | 
-                color.green << myGreenFieldPosition | 
-                color.blue << myBlueFieldPosition;
+            uint32_t printColor = color.red << myFrameBuffer.redFieldPosition |
+                color.green << myFrameBuffer.greenFieldPosition |
+                color.blue << myFrameBuffer.blueFieldPosition;
             *currentAddress = printColor;
         }
         else
@@ -50,7 +41,7 @@ void DirectDisplayTextBuffer::printChar(const uint32_t xPos, const uint32_t yPos
 
         if ((iGlyphPixel + 1) % 8 == 0)
         {
-            currentAddress = (uint32_t*)((uint8_t*)currentAddress + myPitch) - 8;
+            currentAddress = (uint32_t*)((uint8_t*)currentAddress + myFrameBuffer.pitch) - 8;
             characterRow++;
         }
     }
@@ -59,7 +50,7 @@ void DirectDisplayTextBuffer::printChar(const uint32_t xPos, const uint32_t yPos
 
 void DirectDisplayTextBuffer::clearScreen()
 {
-    uint8_t* currentAddress = myAddress;
+    uint8_t* currentAddress = myFrameBuffer.address;
     while (currentAddress != myMaxAddress)
     {
         *currentAddress = 0x0;
@@ -69,11 +60,12 @@ void DirectDisplayTextBuffer::clearScreen()
     myRow = 0;
 }
 
-void DirectDisplayTextBuffer::scrollText() const {
-    uint8_t* currentAddress = myAddress;
-    while (currentAddress != (myMaxAddress - myPitch * 16))
+void DirectDisplayTextBuffer::scrollText() const
+{
+    uint8_t* currentAddress = myFrameBuffer.address;
+    while (currentAddress != (myMaxAddress - myFrameBuffer.pitch * 16))
     {
-        *currentAddress = *(currentAddress + myPitch * 16);
+        *currentAddress = *(currentAddress + myFrameBuffer.pitch * 16);
         currentAddress++;
     }
     while (currentAddress != myMaxAddress)
@@ -96,15 +88,15 @@ void DirectDisplayTextBuffer::writeChar(const char character)
         myColumn++;
     }
 
-    if (myColumn >= myWidth/8)
+    if (myColumn >= myFrameBuffer.width/8)
     {
         myRow +=1;
         myColumn = 0;
     }
-    if (myRow >= myHeight/16)
+    if (myRow >= myFrameBuffer.height/16)
     {
         scrollText();
         myColumn = 0;
-        myRow = myHeight/16 - 1;
+        myRow = myFrameBuffer.height/16 - 1;
     }
 }

@@ -16,5 +16,6 @@ set(commonHeaders
         MemoryAllocator.hpp
         MemoryAllocatorNode.hpp
         TextBuffer.hpp
-        VGATextModeBuffer.hpp)
+        VGATextModeBuffer.hpp
+        FrameBuffer.hpp)
 publicizeHeaders(common PUBLIC commonHeaders)
