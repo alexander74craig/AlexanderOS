@@ -21,7 +21,7 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
         return;
     }
     BootInformation bootInformation(grubBootInformationAddress);
-    MemoryAllocator::instance().intitializeMemory(bootInformation.getFreeMemory());
+    MemoryAllocator::instance().initializeMemory(bootInformation.getFreeMemory());
     TextBuffer* textBuffer{nullptr};
 
 
@@ -36,16 +36,10 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
         textBuffer->writeString("Direct display text buffer.");
     }
 
-    const MemoryList& freeMemory {bootInformation.getFreeMemory()};
-    for (size_t i = 0; i < freeMemory.size(); i++)
-    {
-        textBuffer->writeString("\nMemory block : ");
-        textBuffer->writeHex(freeMemory.at(i).address);
-        textBuffer->writeString("  | length : ");
-        textBuffer->writeHex(freeMemory.at(i).size);
-    }
+    textBuffer->writeString("\nMemory allocator total memory: ");
+    textBuffer->writeHex(MemoryAllocator::instance().getTotalMemorySize());
 
     textBuffer->writeString("\nMemory allocator free memory: ");
-    textBuffer->writeHex(MemoryAllocator::instance().getMemorySize());
+    textBuffer->writeHex(MemoryAllocator::instance().getFreeMemorySize());
 }
 }

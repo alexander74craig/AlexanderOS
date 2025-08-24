@@ -27,8 +27,9 @@ TEST(MemoryAllocator, coalescence)
     memoryList.pushBack({reinterpret_cast<uint64_t>(memory.byeArrayE), size});
     memoryList.pushBack({reinterpret_cast<uint64_t>(memory.byeArrayD), size});
 
-    MemoryAllocator::instance().intitializeMemory(memoryList);
-    ASSERT_EQ(MemoryAllocator::instance().getMemorySize(), size * 7);
+    MemoryAllocator::instance().initializeMemory(memoryList);
+    ASSERT_EQ(MemoryAllocator::instance().getFreeMemorySize(), size * 7);
+    ASSERT_EQ(MemoryAllocator::instance().getTotalMemorySize(), size * 7);
     ASSERT_EQ(MemoryAllocator::instance().getFragmentation(), 1);
 }
 
@@ -38,8 +39,9 @@ TEST(MemoryAllocator, blockSizeAlignment)
     alignas(16) uint8_t buffer[1600];
     MemoryList memoryList{};
     memoryList.pushBack({reinterpret_cast<uint64_t>(buffer), 1600 - 1});
-    MemoryAllocator::instance().intitializeMemory(memoryList);
-    ASSERT_EQ(MemoryAllocator::instance().getMemorySize(), 1600 - 16);
+    MemoryAllocator::instance().initializeMemory(memoryList);
+    ASSERT_EQ(MemoryAllocator::instance().getFreeMemorySize(), 1600 - 16);
+    ASSERT_EQ(MemoryAllocator::instance().getTotalMemorySize(), 1600 - 16);
 }
 
 //! \test Tests that the allocator will align block addresses.
@@ -48,8 +50,9 @@ TEST(MemoryAllocator, blockAddressAlignment)
     alignas(16) uint8_t buffer[1600];
     MemoryList memoryList{};
     memoryList.pushBack({reinterpret_cast<uint64_t>(buffer) + 1, 1200});
-    MemoryAllocator::instance().intitializeMemory(memoryList);
-    ASSERT_EQ(MemoryAllocator::instance().getMemorySize(), 1200 - 16);
+    MemoryAllocator::instance().initializeMemory(memoryList);
+    ASSERT_EQ(MemoryAllocator::instance().getFreeMemorySize(), 1200 - 16);
+    ASSERT_EQ(MemoryAllocator::instance().getTotalMemorySize(), 1200 - 16);
 }
 
 //! \test Tests that the allocator will align block addresses and sizes simultaneously.
@@ -58,8 +61,9 @@ TEST(MemoryAllocator, blockAlignment)
     alignas(16) uint8_t buffer[1600];
     MemoryList memoryList{};
     memoryList.pushBack({reinterpret_cast<uint64_t>(buffer) - 1, 1600 + 1});
-    MemoryAllocator::instance().intitializeMemory(memoryList);
-    ASSERT_EQ(MemoryAllocator::instance().getMemorySize(), 1600);
+    MemoryAllocator::instance().initializeMemory(memoryList);
+    ASSERT_EQ(MemoryAllocator::instance().getFreeMemorySize(), 1600);
+    ASSERT_EQ(MemoryAllocator::instance().getTotalMemorySize(), 1600);
 }
 
 //! \test Tests that the allocator will align allocations.
@@ -68,7 +72,8 @@ TEST(MemoryAllocator, allocAlignment)
     alignas(16) uint8_t buffer[1600];
     MemoryList memoryList{};
     memoryList.pushBack({reinterpret_cast<uint64_t>(buffer), 1600});
-    MemoryAllocator::instance().intitializeMemory(memoryList);
+    MemoryAllocator::instance().initializeMemory(memoryList);
+    EXPECT_EQ(MemoryAllocator::instance().getTotalMemorySize(), 1600);
 
     void* p1{MemoryAllocator::instance().alloc(1)};
     void* p2{MemoryAllocator::instance().alloc(17)};
@@ -90,7 +95,7 @@ TEST(MemoryAllocator, allocAlignment)
     ASSERT_TRUE(isAligned(p5));
     ASSERT_TRUE(isAligned(p6));
 
-    EXPECT_EQ(MemoryAllocator::instance().getMemorySize(), 1600 - (16 + 32 + 32 + 128 + 16 + 1056));
+    EXPECT_EQ(MemoryAllocator::instance().getFreeMemorySize(), 1600 - (16 + 32 + 32 + 128 + 16 + 1056));
 
     MemoryAllocator::instance().free(p1, 1);
     MemoryAllocator::instance().free(p2, 17);
@@ -99,7 +104,7 @@ TEST(MemoryAllocator, allocAlignment)
     MemoryAllocator::instance().free(p5, 3);
     MemoryAllocator::instance().free(p6, 1055);
 
-    ASSERT_EQ(MemoryAllocator::instance().getMemorySize(), 1600);
+    ASSERT_EQ(MemoryAllocator::instance().getFreeMemorySize(), 1600);
     ASSERT_EQ(MemoryAllocator::instance().getFragmentation(), 1);
 }
 
@@ -128,23 +133,27 @@ TEST(MemoryAllocator, emptyBlock)
     memoryList.pushBack({reinterpret_cast<uint64_t>(memory.byeArrayF), size});
     memoryList.pushBack({reinterpret_cast<uint64_t>(memory.byeArrayH), size});
 
-    MemoryAllocator::instance().intitializeMemory(memoryList);
-    ASSERT_EQ(MemoryAllocator::instance().getMemorySize(), size * 5);
+    MemoryAllocator::instance().initializeMemory(memoryList);
+    ASSERT_EQ(MemoryAllocator::instance().getFreeMemorySize(), size * 5);
+    ASSERT_EQ(MemoryAllocator::instance().getTotalMemorySize(), size * 5);
     ASSERT_EQ(MemoryAllocator::instance().getFragmentation(), 4);
 
     void* fullBlock{MemoryAllocator::instance().alloc(size)};
-    ASSERT_EQ(MemoryAllocator::instance().getMemorySize(), size * 4);
+    ASSERT_EQ(MemoryAllocator::instance().getFreeMemorySize(), size * 4);
     ASSERT_EQ(MemoryAllocator::instance().getFragmentation(), 3);
 
     MemoryAllocator::instance().free(fullBlock, size);
-    ASSERT_EQ(MemoryAllocator::instance().getMemorySize(), size * 5);
+    ASSERT_EQ(MemoryAllocator::instance().getFreeMemorySize(), size * 5);
     ASSERT_EQ(MemoryAllocator::instance().getFragmentation(), 4);
 
     void* doubleBlock{MemoryAllocator::instance().alloc(size*2)};
-    ASSERT_EQ(MemoryAllocator::instance().getMemorySize(), size * 3);
+    ASSERT_EQ(MemoryAllocator::instance().getFreeMemorySize(), size * 3);
     ASSERT_EQ(MemoryAllocator::instance().getFragmentation(), 3);
 
     MemoryAllocator::instance().free(doubleBlock, size*2);
-    ASSERT_EQ(MemoryAllocator::instance().getMemorySize(), size * 5);
+    ASSERT_EQ(MemoryAllocator::instance().getFreeMemorySize(), size * 5);
+    ASSERT_EQ(MemoryAllocator::instance().getTotalMemorySize(), size * 5);
     ASSERT_EQ(MemoryAllocator::instance().getFragmentation(), 4);
 }
+
+// TODO: Add test case for attempting to allocate at nullptr?

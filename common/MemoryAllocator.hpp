@@ -34,22 +34,29 @@ public:
 
     //! \brief Allocates all the memory blocks in the given list as free memory to allocate.
     //! \param[in] memory List of memory blocks to be used for allocation.
-    void intitializeMemory(const MemoryList& memory);
+    void initializeMemory(const MemoryList& memory);
 
     //! \brief Calculates the total amount of free memory left.
     //! \return The total free memory currently available for allocation.
-    [[nodiscard]] uint64_t getMemorySize() const;
+    [[nodiscard]] uint64_t getFreeMemorySize() const;
 
     //! \brief Calculates the total number of free memory blocks
     //! \return Total number of free memory blocks.
     [[nodiscard]] uint64_t getFragmentation() const;
 
+    //! \brief Gets the total memory size, including allocated memory.
+    //! \return myTotalSize.
+    [[nodiscard]] uint64_t getTotalMemorySize() const;
+
 private:
     //! \brief Head of the linked list of free memory blocks.
-    MemoryAllocatorNode* myRootAddress;
+    MemoryAllocatorNode* myRootAddress{nullptr};
 
     //! \brief Hidden default constructor.
-    MemoryAllocator() : myRootAddress{nullptr} {};
+    MemoryAllocator() = default;
+
+    //! \brief Total size of memory, including allocated.
+    uint64_t myTotalSize{0};
 
     //! \brief Calculates the next value aligned to 16.
     //! \param[in] toAlign Value to align to 16.

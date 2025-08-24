@@ -41,17 +41,6 @@ void MemoryAllocator::linkMemory(uint64_t address, uint64_t size)
         return;
     }
 
-    // Prevent linking code directly at the nullptr
-    if (address == 0)
-    {
-        if (size <= 16)
-        {
-            return;
-        }
-        size -= 16;
-        address = 16;
-    }
-
     // If the root node has been initialized, link the new memory segment
     if (myRootAddress != nullptr)
     {
@@ -149,16 +138,31 @@ void MemoryAllocator::free(void* ptr, size_t size)
     linkMemory(reinterpret_cast<uint64_t>(ptr), size);
 }
 
-void MemoryAllocator::intitializeMemory(const MemoryList& memory)
+void MemoryAllocator::initializeMemory(const MemoryList& memory)
 {
     for (size_t i = 0; i < memory.size(); i++)
     {
-        linkMemory(memory.at(i).address, memory.at(i).size);
+        // Align address and size before linking.
+        uint64_t address{memory.at(i).address}, size{memory.at(i).size};
+        alignBlock(address, size);
+
+        // Prevent linking code directly at the nullptr
+        if (address == 0)
+        {
+            if (size <= 16)
+            {
+                return;
+            }
+            size -= 16;
+            address = 16;
+        }
+
+        myTotalSize += size;
+        linkMemory(address, size);
     }
-    //TODO: Track total memory added
 }
 
-uint64_t MemoryAllocator::getMemorySize() const
+uint64_t MemoryAllocator::getFreeMemorySize() const
 {
     MemoryAllocatorNode* trace = myRootAddress;
     uint64_t size = 0;
@@ -180,3 +184,9 @@ uint64_t MemoryAllocator::getFragmentation() const
     }
     return fragmentation;
 }
+
+uint64_t MemoryAllocator::getTotalMemorySize() const
+{
+    return myTotalSize;
+}
+
