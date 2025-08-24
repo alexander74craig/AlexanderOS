@@ -21,29 +21,31 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
         return;
     }
     BootInformation bootInformation(grubBootInformationAddress);
+    MemoryAllocator::instance().intitializeMemory(bootInformation.getFreeMemory());
+    TextBuffer* textBuffer{nullptr};
+
 
     if (bootInformation.getFrameBuffer().type == 2)
     {
-        VGATextModeBuffer textBuffer{};
-        textBuffer.writeString("VGA text buffer.");
+        textBuffer = new VGATextModeBuffer{};
+        textBuffer->writeString("VGA text buffer.");
     }
     else if (bootInformation.getFrameBuffer().type == 1)
     {
-        DirectDisplayTextBuffer textBuffer{bootInformation.getFrameBuffer()};
-        textBuffer.writeString("Direct display text buffer.");
-
-        const MemoryList& freeMemory {bootInformation.getFreeMemory()};
-        MemoryAllocator::instance().intitializeMemory(freeMemory);
-        for (size_t i = 0; i < freeMemory.size(); i++)
-        {
-            textBuffer.writeString("\nMemory block : ");
-            textBuffer.writeHex(freeMemory.at(i).address);
-            textBuffer.writeString("  | length : ");
-            textBuffer.writeHex(freeMemory.at(i).size);
-        }
-
-        textBuffer.writeString("\nMemory allocator free memory: ");
-        textBuffer.writeHex(MemoryAllocator::instance().getMemorySize());
+        textBuffer = new DirectDisplayTextBuffer{bootInformation.getFrameBuffer()};
+        textBuffer->writeString("Direct display text buffer.");
     }
+
+    const MemoryList& freeMemory {bootInformation.getFreeMemory()};
+    for (size_t i = 0; i < freeMemory.size(); i++)
+    {
+        textBuffer->writeString("\nMemory block : ");
+        textBuffer->writeHex(freeMemory.at(i).address);
+        textBuffer->writeString("  | length : ");
+        textBuffer->writeHex(freeMemory.at(i).size);
+    }
+
+    textBuffer->writeString("\nMemory allocator free memory: ");
+    textBuffer->writeHex(MemoryAllocator::instance().getMemorySize());
 }
 }
