@@ -45,4 +45,5 @@ RUN mkdir /build/gcc-build \
 
 RUN apt update && \
     apt install -y \
-    grub-pc-bin
+    grub-pc-bin \
+    gdb

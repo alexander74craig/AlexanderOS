@@ -1,8 +1,7 @@
-#include "stddef.h"
-
 extern "C"
 {
 
+#include "stddef.h"
 #include "BootInformation.hpp"
 #include "DirectDisplayTextBuffer.hpp"
 #include "VGATextModeBuffer.hpp"
@@ -33,32 +32,18 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
         DirectDisplayTextBuffer textBuffer{bootInformation.getFrameBuffer()};
         textBuffer.writeString("Direct display text buffer.");
 
-        textBuffer.writeString("\nMultiBoot2 address: ");
-        textBuffer.writeHex(reinterpret_cast<uint64_t>(grubBootInformationAddress));
-
-        extern void* kernelStart;
-        const uint64_t kernelStartAddress {reinterpret_cast<uint64_t>(&kernelStart)};
-        textBuffer.writeString("\nKernel start : ");
-        textBuffer.writeHex(kernelStartAddress);
-
-        extern void* kernelEnd;
-        const uint64_t kernelEndAddress {reinterpret_cast<uint64_t>(&kernelEnd)};
-        textBuffer.writeString("\nKernel end : ");
-        textBuffer.writeHex(kernelEndAddress);
-
-        MemoryAllocatorNode* node = MemoryAllocator::instance().myRootAddress;
-        if (node == nullptr)
+        const MemoryList& freeMemory {bootInformation.getFreeMemory()};
+        MemoryAllocator::instance().intitializeMemory(freeMemory);
+        for (size_t i = 0; i < freeMemory.size(); i++)
         {
-            textBuffer.writeString("\nMemory allocator empty.");
-        }
-        while (node != nullptr)
-        {
-            textBuffer.writeString("\nAddress : ");
-            textBuffer.writeHex(reinterpret_cast<uint64_t>(node));
+            textBuffer.writeString("\nMemory block : ");
+            textBuffer.writeHex(freeMemory.at(i).address);
             textBuffer.writeString("  | length : ");
-            textBuffer.writeHex(node->size);
-            node = node->nextAddress;
+            textBuffer.writeHex(freeMemory.at(i).size);
         }
+
+        textBuffer.writeString("\nMemory allocator free memory: ");
+        textBuffer.writeHex(MemoryAllocator::instance().getMemorySize());
     }
 }
 }

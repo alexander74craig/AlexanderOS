@@ -120,7 +120,6 @@ void BootInformation::readMemoryMap(const uint32_t dataSize)
         uint64_t size {readUint64()};
         uint32_t type {readUint32()};
         readUint32(); // Reserved, must be 0 and ignored
-        //TODO: Ensure that you don't overwrite the multiboot 2 header yet.
         // Ensures the entry is free ram
         if (type == 1 )
         {
@@ -128,7 +127,7 @@ void BootInformation::readMemoryMap(const uint32_t dataSize)
             if (!(address + size > kernelStartAddress
                 && kernelEndAddress > address))
             {
-                MemoryAllocator::instance().linkMemory(address, size);
+                myFreeMemory.pushBack({address, size});
             }
             // If a section of memory overlaps the kernel
             else
@@ -136,12 +135,12 @@ void BootInformation::readMemoryMap(const uint32_t dataSize)
                 // Memory before the kernel
                 if (address < kernelStartAddress)
                 {
-                    MemoryAllocator::instance().linkMemory(address, kernelStartAddress - address);
+                    myFreeMemory.pushBack({address, kernelStartAddress - address});
                 }
                 // Memory after the kernel
                 if (address + size > (kernelEndAddress + 1))
                 {
-                    MemoryAllocator::instance().linkMemory(kernelEndAddress + 1, size + address - (kernelEndAddress + 1));
+                    myFreeMemory.pushBack({kernelEndAddress + 1, size + address - (kernelEndAddress + 1)});
                 }
             }
         }

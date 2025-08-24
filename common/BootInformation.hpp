@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Memory.hpp>
+
 #include "stdint.h"
 #include "FrameBuffer.hpp"
 
@@ -14,7 +16,11 @@ public:
 
     //! \brief Get accessor for framebuffer information.
     //! \return myFrameBuffer.
-    [[nodiscard]] const FrameBuffer& getFrameBuffer() const {return myFrameBuffer;};
+    [[nodiscard]] const FrameBuffer& getFrameBuffer() const {return myFrameBuffer;}
+
+    //! \brief Get accessor for free memory block information.
+    //! \return myFreeMemory.
+    [[nodiscard]] const MemoryList& getFreeMemory() const {return myFreeMemory;}
 
 private:
     //! \brief Reads 8 bytes and progresses the pointer.
@@ -43,4 +49,7 @@ private:
 
     //! \brief Frame buffer information.
     FrameBuffer myFrameBuffer{};
+
+    //! \brief List of free memory blocks.
+    MemoryList myFreeMemory{};
 };
