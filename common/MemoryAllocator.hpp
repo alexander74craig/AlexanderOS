@@ -8,10 +8,7 @@ class MemoryAllocator {
 public:
     //! \brief Singleton constructor. Makes an empty allocator.
     //! \return Singleton instance of the memory allocator.
-    static MemoryAllocator& instance() {
-        static MemoryAllocator instance;
-        return instance;
-    }
+    static MemoryAllocator& instance();
 
     //! \brief Deleted copy constructor.
     MemoryAllocator(const MemoryAllocator&) = delete;

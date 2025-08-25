@@ -108,7 +108,6 @@ TEST(MemoryAllocator, allocAlignment)
     ASSERT_EQ(MemoryAllocator::instance().getFragmentation(), 1);
 }
 
-//TODO: Add test fully emptying a free memory block.
 TEST(MemoryAllocator, emptyBlock)
 {
     constexpr  uint64_t size{1600};

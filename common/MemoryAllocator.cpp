@@ -1,6 +1,9 @@
 #include "MemoryAllocator.hpp"
 
-
+MemoryAllocator& MemoryAllocator::instance() {
+    static MemoryAllocator instance;
+    return instance;
+}
 
 uint64_t inline MemoryAllocator::align(const uint64_t toAlign)
 {
