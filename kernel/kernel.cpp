@@ -14,7 +14,9 @@ extern "C"
 //! \param[in] grubBootInformationAddress Location of Multiboot 2 header
 void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMagicNumber, void* grubBootInformationAddress) 
 {
-
+    VGATextModeBuffer textBuffer{};
+    textBuffer.writeString("VGA text buffer.");
+/*
     if (grubMagicNumber != 0x36d76289)
     {
         //TODO: Invalid bootloader magic number.
@@ -41,5 +43,6 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
 
     textBuffer->writeString("\nMemory allocator free memory: ");
     textBuffer->writeHex(MemoryAllocator::instance().getFreeMemorySize());
+    */
 }
 }

@@ -6,26 +6,28 @@ extern "C"
 //! \brief IDT entry
 struct GateDescriptor
 {
-    uint16_t    ISR_AddressLow; // The lower 16 bits of the ISR's address
-	uint16_t    segmentSelector; // The GDT segment that the CPU will load into CS before calling the ISR
-	uint8_t     reserved; // Reserved 0'd out space
-    uint8_t     flags; // Flags used to specify type of gate of the interrupt entry
-	uint16_t    ISR_AddressHigh; // The higher 16 bits of the ISR's address
+    uint16_t ISR_AddressLow;  // ISR address bits 0-15
+    uint16_t segmentSelector; // Selects a code segment in the GDT
+    uint8_t  IST;             // IST bits 0-2 holds, else reserved zeros
+    uint8_t  flags;           // Gate type 0-3, Reserved 4, DPL 5-6, P 7.
+    uint16_t ISR_AddressMed;  // ISR address bits 16-31
+    uint32_t ISR_AddressHigh; // ISR address bits 32-63
+    uint32_t zero;            // Reserved
 };
 #pragma pack(pop)
 
 #pragma pack(push, 1)
 //! \brief Struct representing the value of the interrupt descriptor table register.
 struct IDTR
-{	
+{
     uint16_t limit; // Limit of address
-	uint32_t base; // Base of address
+	uint64_t base;  // Base of address
 };
 #pragma pack(pop)
 
 //! \brief Function called when interrupts occur
 //! \param[in] interruptIndex Index of the calling interrupt within the interrupt table.
-void handleInterrupt(uint32_t interruptIndex)
+void handleInterrupt(uint64_t interruptIndex)
 {
     asm("hlt");
 }
@@ -37,19 +39,17 @@ static GateDescriptor idt[256];
 
 static IDTR idtr;
 
-// Access the value of the code segment offset from the GDT
-extern uint32_t codeSeg;
-#define codeSegValue ((uint32_t) (&codeSeg))
-
 void setGateDescriptor(uint8_t index, void* isr, uint8_t flags)
 {
     GateDescriptor* descriptor = &idt[index];
 
-    descriptor->ISR_AddressLow = reinterpret_cast<uint32_t>(isr) & 0xFFFF;
-    descriptor->segmentSelector = codeSegValue;
-    descriptor->reserved = 0x00;
+    descriptor->ISR_AddressLow = reinterpret_cast<uint64_t>(isr) & 0xFFFF;
+    descriptor->segmentSelector = 0x08; // Code segment
+    descriptor->IST = 0;
     descriptor->flags = flags;
-    descriptor->ISR_AddressHigh = reinterpret_cast<uint32_t>(isr) >> 16;
+    descriptor->ISR_AddressMed = (reinterpret_cast<uint64_t>(isr) >> 16) & 0xFFFF;
+    descriptor->ISR_AddressHigh = (reinterpret_cast<uint64_t>(isr) >> 32) & 0xFFFFFFFF;
+    descriptor->zero = 0;
 }
 
 extern void* interruptServiceRoutineTable[];
@@ -58,7 +58,7 @@ extern void* interruptServiceRoutineTable[];
 void initializeInterruptDescriptorTable()
 {
     constexpr uint32_t numberOfGateDescriptors{32};
-    idtr.base = reinterpret_cast<uint32_t>(&idt[0]);
+    idtr.base = reinterpret_cast<uint64_t>(&idt[0]);
     idtr.limit =static_cast<uint16_t>(sizeof(GateDescriptor)) * numberOfGateDescriptors - 1;
 
     for (uint32_t index {0}; index < numberOfGateDescriptors; index++)
@@ -69,6 +69,6 @@ void initializeInterruptDescriptorTable()
     // Load the IDT
     asm("lidt %0" : : "m"(idtr));
     // Enable interrupts
-    asm("sti");
+    // asm("sti"); // TODO: Enable interrupts elsewhere
 }
 }

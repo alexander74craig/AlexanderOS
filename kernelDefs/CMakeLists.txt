@@ -6,7 +6,7 @@ set(kernelDefsHeaders
         stdint.h)
 publicizeHeaders(kernelDefs INTERFACE kernelDefsHeaders)
 target_compile_options(kernelDefs INTERFACE
-        $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra -fno-rtti -ffreestanding -fno-exceptions -fno-threadsafe-statics>
+        $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra -fno-rtti -ffreestanding -fno-exceptions -fno-threadsafe-statics -mno-red-zone -mcmodel=kernel>
         $<$<COMPILE_LANGUAGE:C>:-Wall -Wextra -ffreestanding>)
 target_link_options(kernelDefs INTERFACE
         -nostdlib

@@ -1,4 +1,7 @@
 ENTRY(_start)
+OUTPUT_FORMAT(elf64-x86-64)
+OUTPUT_ARCH(i386:x86-64)
+
 SECTIONS
 {
 	. = 2M; /* Sets the location in memory to 2 MiB*/
@@ -6,7 +9,7 @@ SECTIONS
 	/* Align all sections on 4 KiB boundaries*/
 	.text BLOCK(4K) : ALIGN(4K)
 	{
-		*(.multiboot)
+		KEEP(*(.multiboot))
 		*(.text)
 	}
 	.rodata BLOCK(4K) : ALIGN(4K)
