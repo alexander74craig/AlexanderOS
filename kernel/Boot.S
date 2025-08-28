@@ -153,8 +153,29 @@ longModeStart:
     mov %ax, %gs
     mov %ax, %fs
 
+    # Enable SSE for x86_64 C++ code
+    mov %cr0, %rax
+    and $~(1 << 2), %rax     # clear EM (bit 2) – disable FPU emulation
+    or  $(1 << 1), %rax      # set MP (bit 1) – monitor coprocessor
+    and $~(1 << 3), %rax     # clear TS (bit 3): task switched
+    mov %rax, %cr0
+    clts
+
+    mov %cr4, %rax
+    or  $((1 << 9) | (1 << 10)), %rax   # OSFXSR (bit 9), OSXMMEXCPT (bit 10)
+    mov %rax, %cr4
+    fninit # Initialize FPU
+
     lea stack_top(%rip), %rsp
     sub $8, %rsp
+
+    # Initialize the IDT so that interrupts can be handled
+    call initializeInterruptDescriptorTable
+
+    # Disabled the PIC
+    mov $0xff, %al
+    out %al, $0x21
+    out %al, $0xa1
 
     # Pass cpuid and multiboot information to main.
     mov cpuidEDX(%rip), %eax
@@ -165,14 +186,6 @@ longModeStart:
     mov %eax, %edx
     mov multibootInfo(%rip), %eax
     mov %rax, %rcx
-
-    # Initialize the IDT so that interrupts can be handled
-    call initializeInterruptDescriptorTable
-
-    # Disabled the PIC
-    mov $0xff, %al
-    out %al, $0x21
-    out %al, $0xa1
 
     .align 16 # Aligns to 16 bytes before call to kernel.
     call main # Calls kernel main.

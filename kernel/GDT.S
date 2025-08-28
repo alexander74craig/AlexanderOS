@@ -81,6 +81,8 @@ gdtDescriptor:
 .global codeSeg32
 .set codeSeg,  gdtCode - gdtStart
 .global codeSeg
+codeSegSelector: .word codeSeg
+.global codeSegSelector
 # Offset for the data descriptor from the start of the GDT descriptor
 .set dataSeg,  gdtData - gdtStart
 .global dataSeg

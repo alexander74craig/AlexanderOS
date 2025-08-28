@@ -1,5 +1,5 @@
 #include "stdint.h"
-
+#include "VGATextModeBuffer.hpp"
 extern "C"
 {
 #pragma pack(push, 1)
@@ -29,7 +29,20 @@ struct IDTR
 //! \param[in] interruptIndex Index of the calling interrupt within the interrupt table.
 void handleInterrupt(uint64_t interruptIndex)
 {
-    asm("hlt");
+    VGATextModeBuffer::instance().writeString("\nInterrupt: ");
+    VGATextModeBuffer::instance().writeHex(interruptIndex);
+    VGATextModeBuffer::instance().writeString("\n");
+
+    if (interruptIndex == 14)
+    {
+        uint64_t cr2;
+        asm("mov %%cr2, %0" : "=r"(cr2));
+        VGATextModeBuffer::instance().writeString("\nCR2: ");
+        VGATextModeBuffer::instance().writeHex(cr2);
+        VGATextModeBuffer::instance().writeString("\n");
+        asm volatile ("cli; hlt");
+    }
+    asm volatile ("cli; hlt");
 }
 
 #pragma pack(push, 16)
@@ -39,12 +52,13 @@ static GateDescriptor idt[256];
 
 static IDTR idtr;
 
+extern uint16_t codeSegSelector;
 void setGateDescriptor(uint8_t index, void* isr, uint8_t flags)
 {
     GateDescriptor* descriptor = &idt[index];
 
     descriptor->ISR_AddressLow = reinterpret_cast<uint64_t>(isr) & 0xFFFF;
-    descriptor->segmentSelector = 0x08; // Code segment
+    descriptor->segmentSelector = codeSegSelector; // Code segment selector
     descriptor->IST = 0;
     descriptor->flags = flags;
     descriptor->ISR_AddressMed = (reinterpret_cast<uint64_t>(isr) >> 16) & 0xFFFF;

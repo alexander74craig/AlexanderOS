@@ -12,37 +12,31 @@ extern "C"
 //! \param[in] cpuidFeaturesECX The CPUID feature flags from the ECX register
 //! \param[in] grubMagicNumber  Multiboot 2 Magic number
 //! \param[in] grubBootInformationAddress Location of Multiboot 2 header
-void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMagicNumber, void* grubBootInformationAddress) 
+void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMagicNumber, void* grubBootInformationAddress)
 {
-    VGATextModeBuffer textBuffer{};
-    textBuffer.writeString("VGA text buffer.");
-/*
     if (grubMagicNumber != 0x36d76289)
     {
         //TODO: Invalid bootloader magic number.
         return;
     }
+
     BootInformation bootInformation(grubBootInformationAddress);
+    auto freeMemory {bootInformation.getFreeMemory()};
+    VGATextModeBuffer::instance().writeString("Free memory: ");
+    for (size_t i{0}; i < freeMemory.size(); i++)
+    {
+        VGATextModeBuffer::instance().writeString("\naddress: ");
+        VGATextModeBuffer::instance().writeHex(freeMemory.at(i).address);
+        VGATextModeBuffer::instance().writeString(" size: ");
+        VGATextModeBuffer::instance().writeHex(freeMemory.at(i).size);
+    }
+
     MemoryAllocator::instance().initializeMemory(bootInformation.getFreeMemory());
-    TextBuffer* textBuffer{nullptr};
 
+    VGATextModeBuffer::instance().writeString("\nMemory allocator total memory: ");
+    VGATextModeBuffer::instance().writeHex(MemoryAllocator::instance().getTotalMemorySize());
 
-    if (bootInformation.getFrameBuffer().type == 2)
-    {
-        textBuffer = new VGATextModeBuffer{};
-        textBuffer->writeString("VGA text buffer.");
-    }
-    else if (bootInformation.getFrameBuffer().type == 1)
-    {
-        textBuffer = new DirectDisplayTextBuffer{bootInformation.getFrameBuffer()};
-        textBuffer->writeString("Direct display text buffer.");
-    }
-
-    textBuffer->writeString("\nMemory allocator total memory: ");
-    textBuffer->writeHex(MemoryAllocator::instance().getTotalMemorySize());
-
-    textBuffer->writeString("\nMemory allocator free memory: ");
-    textBuffer->writeHex(MemoryAllocator::instance().getFreeMemorySize());
-    */
+    VGATextModeBuffer::instance().writeString("\nMemory allocator free memory: ");
+    VGATextModeBuffer::instance().writeHex(MemoryAllocator::instance().getFreeMemorySize());
 }
 }

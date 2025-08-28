@@ -6,6 +6,11 @@ VGATextModeBuffer::VGATextModeBuffer() :
 {
 }
 
+VGATextModeBuffer& VGATextModeBuffer::instance() {
+    static VGATextModeBuffer instance;
+    return instance;
+}
+
 void VGATextModeBuffer::scroll()
 {
     char* position = (char*) 0xB8000;
