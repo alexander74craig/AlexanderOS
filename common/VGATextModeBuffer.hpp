@@ -4,18 +4,8 @@
 class VGATextModeBuffer : public TextBuffer
 {
 public:
-    //! \brief Singleton constructor.
-    //! \return Singleton instance of the vga text mode buffer.
-    static VGATextModeBuffer& instance();
-
-    //! \brief Deleted copy constructor.
-    VGATextModeBuffer(const VGATextModeBuffer&) = delete;
-    //! \brief Deleted copy assignment operator.
-    VGATextModeBuffer& operator=(const VGATextModeBuffer&) = delete;
-    //! \brief Deleted move constructor.
-    VGATextModeBuffer(VGATextModeBuffer&&) = delete;
-    //! \brief Deleted move assignment operator.
-    VGATextModeBuffer& operator=(VGATextModeBuffer&&) = delete;
+    //! \brief Default constructor, clears the screen.
+    VGATextModeBuffer();
 
     //! \brief Defaulted destructor for polymorphism.
     ~VGATextModeBuffer() override = default;
@@ -25,11 +15,10 @@ public:
     void writeChar(char character) override;
 
     //! \brief Clears the screen and sets the current position to 0,0.
-    void clearScreen() override;
+    void clearScreen();
 
 private:
-    //! \brief Default constructor, clears the screen.
-    VGATextModeBuffer();
+
 
     //! \brief Current horizontal character position. Max 80 characters per line
     uint32_t myColumn;

@@ -1,3 +1,5 @@
+#include <SerialTextBuffer.hpp>
+
 extern "C"
 {
 
@@ -22,21 +24,25 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
 
     BootInformation bootInformation(grubBootInformationAddress);
     auto freeMemory {bootInformation.getFreeMemory()};
-    VGATextModeBuffer::instance().writeString("Free memory: ");
+    VGATextModeBuffer textBuffer;
+    textBuffer.writeString("Free memory: ");
     for (size_t i{0}; i < freeMemory.size(); i++)
     {
-        VGATextModeBuffer::instance().writeString("\naddress: ");
-        VGATextModeBuffer::instance().writeHex(freeMemory.at(i).address);
-        VGATextModeBuffer::instance().writeString(" size: ");
-        VGATextModeBuffer::instance().writeHex(freeMemory.at(i).size);
+        textBuffer.writeString("\naddress: ");
+        textBuffer.writeHex(freeMemory.at(i).address);
+        textBuffer.writeString(" size: ");
+        textBuffer.writeHex(freeMemory.at(i).size);
     }
 
     MemoryAllocator::instance().initializeMemory(bootInformation.getFreeMemory());
 
-    VGATextModeBuffer::instance().writeString("\nMemory allocator total memory: ");
-    VGATextModeBuffer::instance().writeHex(MemoryAllocator::instance().getTotalMemorySize());
+    textBuffer.writeString("\nMemory allocator total memory: ");
+    textBuffer.writeHex(MemoryAllocator::instance().getTotalMemorySize());
 
-    VGATextModeBuffer::instance().writeString("\nMemory allocator free memory: ");
-    VGATextModeBuffer::instance().writeHex(MemoryAllocator::instance().getFreeMemorySize());
+    textBuffer.writeString("\nMemory allocator free memory: ");
+    textBuffer.writeHex(MemoryAllocator::instance().getFreeMemorySize());
+
+    SerialTextBuffer serial{SerialPort::COM1};
+    serial.writeString("Hello world!\n");
 }
 }

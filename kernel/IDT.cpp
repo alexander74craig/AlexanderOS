@@ -1,3 +1,5 @@
+#include <SerialTextBuffer.hpp>
+
 #include "stdint.h"
 #include "VGATextModeBuffer.hpp"
 extern "C"
@@ -29,19 +31,10 @@ struct IDTR
 //! \param[in] interruptIndex Index of the calling interrupt within the interrupt table.
 void handleInterrupt(uint64_t interruptIndex)
 {
-    VGATextModeBuffer::instance().writeString("\nInterrupt: ");
-    VGATextModeBuffer::instance().writeHex(interruptIndex);
-    VGATextModeBuffer::instance().writeString("\n");
-
-    if (interruptIndex == 14)
-    {
-        uint64_t cr2;
-        asm("mov %%cr2, %0" : "=r"(cr2));
-        VGATextModeBuffer::instance().writeString("\nCR2: ");
-        VGATextModeBuffer::instance().writeHex(cr2);
-        VGATextModeBuffer::instance().writeString("\n");
-        asm volatile ("cli; hlt");
-    }
+    SerialTextBuffer serial{SerialPort::COM1};
+    serial.writeString(const_cast<char*>("\nInterrupt: "));
+    serial.writeHex(interruptIndex);
+    serial.writeString(const_cast<char*>("\n"));
     asm volatile ("cli; hlt");
 }
 

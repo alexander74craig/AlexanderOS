@@ -21,7 +21,7 @@ public:
     void writeChar(char character) override;
 
     //! \brief Clears the screen and sets current position to 0,0.
-    void clearScreen() override;
+    void clearScreen();
 
 private:
     //! \brief Writes a character to the given position on the screen.

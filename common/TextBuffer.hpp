@@ -22,7 +22,4 @@ public:
 
     // Writes a string at the current position.
     virtual void writeString(char* string);
-
-    // Clears the screen and sets current character position to 0,0.
-    virtual void clearScreen() = 0;
 };
