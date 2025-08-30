@@ -1,3 +1,4 @@
+#include <CPUID.hpp>
 #include <SerialTextBuffer.hpp>
 
 extern "C"
@@ -5,17 +6,18 @@ extern "C"
 
 #include "stddef.h"
 #include "BootInformation.hpp"
-#include "DirectDisplayTextBuffer.hpp"
-#include "VGATextModeBuffer.hpp"
+#include "DirectRGBTextBuffer.hpp"
+#include "EGATextBuffer.hpp"
 #include "MemoryAllocator.hpp"
 
 //! \brief Main entry point of the kernel.
-//! \param[in] cpuidFeaturesEDX The CPUID feature flags from the EDX register.
-//! \param[in] cpuidFeaturesECX The CPUID feature flags from the ECX register
 //! \param[in] grubMagicNumber  Multiboot 2 Magic number
 //! \param[in] grubBootInformationAddress Location of Multiboot 2 header
-void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMagicNumber, void* grubBootInformationAddress)
+void main(uint32_t grubMagicNumber, void* grubBootInformationAddress)
 {
+    // Enable interrupts
+    asm("sti");
+
     if (grubMagicNumber != 0x36d76289)
     {
         //TODO: Invalid bootloader magic number.
@@ -24,25 +26,44 @@ void main(uint32_t cpuidFeaturesEDX, uint32_t cpuidFeaturesECX, uint32_t grubMag
 
     BootInformation bootInformation(grubBootInformationAddress);
     auto freeMemory {bootInformation.getFreeMemory()};
-    VGATextModeBuffer textBuffer;
-    textBuffer.writeString("Free memory: ");
-    for (size_t i{0}; i < freeMemory.size(); i++)
-    {
-        textBuffer.writeString("\naddress: ");
-        textBuffer.writeHex(freeMemory.at(i).address);
-        textBuffer.writeString(" size: ");
-        textBuffer.writeHex(freeMemory.at(i).size);
-    }
-
     MemoryAllocator::instance().initializeMemory(bootInformation.getFreeMemory());
 
-    textBuffer.writeString("\nMemory allocator total memory: ");
-    textBuffer.writeHex(MemoryAllocator::instance().getTotalMemorySize());
+    TextBuffer* textBuffer{};
+    if (bootInformation.getFrameBuffer().type == FrameBufferType::EGA)
+    {
+        textBuffer = new EGATextBuffer{};
+    }
+    else if (bootInformation.getFrameBuffer().type == FrameBufferType::Direct)
+    {
+        textBuffer = new DirectRGBTextBuffer{bootInformation.getFrameBuffer()};
+    }
+    else
+    {
+        textBuffer = new SerialTextBuffer{SerialPort::COM1};
+    }
 
-    textBuffer.writeString("\nMemory allocator free memory: ");
-    textBuffer.writeHex(MemoryAllocator::instance().getFreeMemorySize());
+    textBuffer->write("Free memory: ");
+    for (size_t i{0}; i < freeMemory.size(); i++)
+    {
+        textBuffer->write("\naddress: ");
+        textBuffer->write(freeMemory.at(i).address);
+        textBuffer->write(" size: ");
+        textBuffer->write(freeMemory.at(i).size);
+    }
 
-    SerialTextBuffer serial{SerialPort::COM1};
-    serial.writeString("Hello world!\n");
+    textBuffer->write("\nMemory allocator total memory: ");
+    textBuffer->write(MemoryAllocator::instance().getTotalMemorySize());
+
+    textBuffer->write("\nMemory allocator free memory: ");
+    textBuffer->write(MemoryAllocator::instance().getFreeMemorySize());
+
+    textBuffer->write("\nFramebuffer address: ");
+    textBuffer->write(reinterpret_cast<uint64_t>(bootInformation.getFrameBuffer().address));
+
+    CPUID cpuid;
+    textBuffer->write("\nCan 1GiB Pages: ");
+    textBuffer->write(cpuid.canHave1GiBPages());
+
+    delete textBuffer;
 }
 }

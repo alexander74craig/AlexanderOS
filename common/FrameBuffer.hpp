@@ -2,6 +2,13 @@
 
 #include "stdint.h"
 
+enum class FrameBufferType
+{
+    Palette = 0,
+    Direct = 1,
+    EGA = 2
+};
+
 //! \brief Stores information about the frame buffer.
 struct FrameBuffer
 {
@@ -16,7 +23,7 @@ struct FrameBuffer
     //! \brief Bits per pixel
     uint8_t bitsPerPixel{0};
     //! Frame buffer type 0 = Indexed color, 1 = direct RGB, 2 = EGA Text
-    uint8_t type{0};
+    FrameBufferType type{};
     //! \brief Position of the red color bits
     uint8_t redFieldPosition{0};
     //! \brief Size, in bits, of the red color

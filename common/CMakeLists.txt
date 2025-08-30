@@ -3,23 +3,25 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.28.3 FATAL_ERROR)
 add_library(common STATIC
         BootInformation.cpp
         Color.cpp
-        DirectDisplayTextBuffer.cpp
+        DirectRGBTextBuffer.cpp
         MemoryAllocator.cpp
         TextBuffer.cpp
-        VGATextModeBuffer.cpp
+        EGATextBuffer.cpp
         Font.S
         CPPSupport.cpp
         Memory.cpp
-        SerialTextBuffer.cpp)
+        SerialTextBuffer.cpp
+        CPUID.cpp)
 set(commonHeaders
         BootInformation.hpp
         Color.hpp
-        DirectDisplayTextBuffer.hpp
+        DirectRGBTextBuffer.hpp
         MemoryAllocator.hpp
         MemoryAllocatorNode.hpp
         TextBuffer.hpp
-        VGATextModeBuffer.hpp
+        EGATextBuffer.hpp
         FrameBuffer.hpp
         Memory.hpp
-        SerialTextBuffer.hpp)
+        SerialTextBuffer.hpp
+        CPUID.hpp)
 publicizeHeaders(common PUBLIC commonHeaders)

@@ -16,7 +16,7 @@ void TextBuffer::writeHexNibble(uint8_t nibble)
     }
 }
 
-void TextBuffer::writeHex(uint8_t byte)
+void TextBuffer::write(uint8_t byte)
 {
     uint8_t lower = 0xF & byte;
     uint8_t upper = byte >> 4;
@@ -24,34 +24,39 @@ void TextBuffer::writeHex(uint8_t byte)
     writeHexNibble(lower);
 }
 
-void TextBuffer::writeHex(const uint16_t int16)
+void TextBuffer::write(const uint16_t int16)
 {
     const uint8_t lower = 0xFF & int16;
     const uint8_t upper = int16 >> 8;
-    writeHex(upper);
-    writeHex(lower);
+    write(upper);
+    write(lower);
 }
 
-void TextBuffer::writeHex(const uint32_t int32)
+void TextBuffer::write(const uint32_t int32)
 {
     const uint16_t lower = 0xFFFF & int32;
     const uint16_t upper = int32 >> 16;
-    writeHex(upper);
-    writeHex(lower);
+    write(upper);
+    write(lower);
 }
 
-void TextBuffer::writeHex(uint64_t int64)
+void TextBuffer::write(uint64_t int64)
 {
     const uint32_t lower = 0xFFFFFFFF & int64;
     const uint32_t upper = int64 >> 32;
-    writeHex(upper);
-    writeHex(lower);
+    write(upper);
+    write(lower);
 }
 
-void TextBuffer:: writeString(char* string)
+void TextBuffer::write(const char* string)
 {
     for (uint32_t charIndex{0}; string[charIndex]; charIndex++)
     {
         writeChar(string[charIndex]);
     }
+}
+
+void TextBuffer::write(bool boolean)
+{
+    write(boolean ? "true" : "false");
 }

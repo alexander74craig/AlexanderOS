@@ -6,19 +6,15 @@
 #include "BootInformation.hpp"
 
 //! \brief 16 bit color depth display
-class DirectDisplayTextBuffer : public TextBuffer
+class DirectRGBTextBuffer : public TextBuffer
 {
 public:
     //! \brief Default constructor, clears the screen.
     //! \param[in] frameBuffer Framebuffer information used to display
-    explicit DirectDisplayTextBuffer(const FrameBuffer& frameBuffer);
+    explicit DirectRGBTextBuffer(const FrameBuffer& frameBuffer);
 
     //! \brief Defaulted destructor for polymorphism.
-    ~DirectDisplayTextBuffer() override = default;
-
-    //! \brief Writes a character at the current position and handles scrolling.
-    //! \param[in] character Character to write.
-    void writeChar(char character) override;
+    ~DirectRGBTextBuffer() override = default;
 
     //! \brief Clears the screen and sets current position to 0,0.
     void clearScreen();
@@ -32,6 +28,10 @@ private:
 
     //! \brief Moves all text up one line, leaving the bottom line clear.
     void scrollText() const;
+
+    //! \brief Writes a character at the current position and handles scrolling.
+    //! \param[in] character Character to write.
+    void writeChar(char character) override;
 
     //! \brief Framebuffer information.
     const FrameBuffer myFrameBuffer;

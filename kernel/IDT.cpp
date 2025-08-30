@@ -1,7 +1,7 @@
 #include <SerialTextBuffer.hpp>
 
 #include "stdint.h"
-#include "VGATextModeBuffer.hpp"
+#include "EGATextBuffer.hpp"
 extern "C"
 {
 #pragma pack(push, 1)
@@ -32,9 +32,17 @@ struct IDTR
 void handleInterrupt(uint64_t interruptIndex)
 {
     SerialTextBuffer serial{SerialPort::COM1};
-    serial.writeString(const_cast<char*>("\nInterrupt: "));
-    serial.writeHex(interruptIndex);
-    serial.writeString(const_cast<char*>("\n"));
+    serial.write("\nInterrupt: ");
+    serial.write(interruptIndex);
+    if (interruptIndex == 0xe) // Page fault.
+    {
+        uint64_t faultAddress;
+        asm volatile ("mov %%cr2, %0" : "=r"(faultAddress));
+        serial.write("\nPage fault address: ");
+        serial.write(faultAddress);
+        serial.write("\n");
+
+    }
     asm volatile ("cli; hlt");
 }
 
@@ -64,7 +72,7 @@ extern void* interruptServiceRoutineTable[];
 //! \brief Initializes the interrupt descriptor table with the addresses of the interrupt service routines
 void initializeInterruptDescriptorTable()
 {
-    constexpr uint32_t numberOfGateDescriptors{32};
+    constexpr uint32_t numberOfGateDescriptors{256};
     idtr.base = reinterpret_cast<uint64_t>(&idt[0]);
     idtr.limit =static_cast<uint16_t>(sizeof(GateDescriptor)) * numberOfGateDescriptors - 1;
 
@@ -75,7 +83,5 @@ void initializeInterruptDescriptorTable()
 
     // Load the IDT
     asm("lidt %0" : : "m"(idtr));
-    // Enable interrupts
-    // asm("sti"); // TODO: Enable interrupts elsewhere
 }
 }

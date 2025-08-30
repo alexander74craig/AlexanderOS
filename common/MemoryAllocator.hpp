@@ -1,7 +1,6 @@
 #pragma once
 #include "stddef.h"
 #include "BootInformation.hpp"
-#include "DirectDisplayTextBuffer.hpp"
 #include "MemoryAllocatorNode.hpp"
 
 class MemoryAllocator {

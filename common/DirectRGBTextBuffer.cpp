@@ -1,6 +1,6 @@
-#include "DirectDisplayTextBuffer.hpp"
+#include "DirectRGBTextBuffer.hpp"
 
-DirectDisplayTextBuffer::DirectDisplayTextBuffer(const FrameBuffer& frameBuffer) :
+DirectRGBTextBuffer::DirectRGBTextBuffer(const FrameBuffer& frameBuffer) :
     myFrameBuffer{frameBuffer},
     myMaxAddress{frameBuffer.address + (frameBuffer.pitch * frameBuffer.height)},
     myColumn{0},
@@ -9,7 +9,7 @@ DirectDisplayTextBuffer::DirectDisplayTextBuffer(const FrameBuffer& frameBuffer)
     //TODO: Check bits per pixel, mask size
 }
 
-void DirectDisplayTextBuffer::printChar(const uint32_t xPos, const uint32_t yPos, const char character)
+void DirectRGBTextBuffer::printChar(const uint32_t xPos, const uint32_t yPos, const char character)
 {
     if (xPos >= myFrameBuffer.width/8 || yPos >= myFrameBuffer.height/16)
     {
@@ -48,7 +48,7 @@ void DirectDisplayTextBuffer::printChar(const uint32_t xPos, const uint32_t yPos
 }
 
 
-void DirectDisplayTextBuffer::clearScreen()
+void DirectRGBTextBuffer::clearScreen()
 {
     uint8_t* currentAddress = myFrameBuffer.address;
     while (currentAddress != myMaxAddress)
@@ -60,7 +60,7 @@ void DirectDisplayTextBuffer::clearScreen()
     myRow = 0;
 }
 
-void DirectDisplayTextBuffer::scrollText() const
+void DirectRGBTextBuffer::scrollText() const
 {
     uint8_t* currentAddress = myFrameBuffer.address;
     while (currentAddress != (myMaxAddress - myFrameBuffer.pitch * 16))
@@ -75,7 +75,7 @@ void DirectDisplayTextBuffer::scrollText() const
     }
 }
 
-void DirectDisplayTextBuffer::writeChar(const char character)
+void DirectRGBTextBuffer::writeChar(const char character)
 {
     if (character == '\n')
     {            

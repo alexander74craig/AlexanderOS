@@ -77,11 +77,23 @@ void BootInformation::readFramebuffer(uint32_t dataSize)
     myFrameBuffer.width = readUint32();
     myFrameBuffer.height = readUint32();
     myFrameBuffer.bitsPerPixel = readUint8();
-    myFrameBuffer.type = readUint8();
+    uint8_t type = readUint8();
+    if (type == static_cast<uint8_t>(FrameBufferType::Direct))
+    {
+        myFrameBuffer.type = FrameBufferType::Direct;
+    }
+    else if (type == static_cast<uint8_t>(FrameBufferType::EGA))
+    {
+        myFrameBuffer.type = FrameBufferType::EGA;
+    }
+    else if (type == static_cast<uint8_t>(FrameBufferType::Palette))
+    {
+        myFrameBuffer.type = FrameBufferType::Palette;
+    }
     // Reserved 2 bytes
     readUint16();
     // Direct Display type
-    if (myFrameBuffer.type == 1)
+    if (myFrameBuffer.type == FrameBufferType::Direct)
     {
         myFrameBuffer.redFieldPosition = readUint8();
         myFrameBuffer.redMaskSize = readUint8();

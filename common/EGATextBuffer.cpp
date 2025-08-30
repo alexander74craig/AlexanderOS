@@ -1,12 +1,12 @@
-#include "VGATextModeBuffer.hpp"
+#include "EGATextBuffer.hpp"
 
-VGATextModeBuffer::VGATextModeBuffer() :
+EGATextBuffer::EGATextBuffer() :
         myColumn{0},
         myRow{0}
 {
 }
 
-void VGATextModeBuffer::scroll()
+void EGATextBuffer::scroll()
 {
     char* position = (char*) 0xB8000;
     char* nextLinePos = position + 160;
@@ -26,7 +26,7 @@ void VGATextModeBuffer::scroll()
     }
 }
 
-void VGATextModeBuffer::writeChar(char character)
+void EGATextBuffer::writeChar(char character)
 {
     if (character == '\n')
     {            
@@ -54,7 +54,7 @@ void VGATextModeBuffer::writeChar(char character)
     }
 }
 
-void VGATextModeBuffer::clearScreen()
+void EGATextBuffer::clearScreen()
 {
     char* position = (char*) 0xB8000;
     for (uint32_t myRow{0}; myRow < 25; myRow++)
